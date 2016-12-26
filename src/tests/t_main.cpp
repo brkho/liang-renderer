@@ -2,7 +2,7 @@
 //
 // Author: brian@brkho.com
 
-#include <gtest/gtest.h>
+#include "tests/test.h"
 
 // Run all the tests.
 GTEST_API_ int main(int argc, char **argv) {

@@ -44,7 +44,7 @@ class Vector2 {
     }
 
     // Component-wise assignment addition.
-    Vector2<T>& operator+(const Vector2<T> &that) {
+    Vector2<T> &operator+=(const Vector2<T> &that) {
       x += that.x;
       y += that.y;
       return *this;

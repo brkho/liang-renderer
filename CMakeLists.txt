@@ -44,6 +44,7 @@ set_target_properties(liang_exe PROPERTIES OUTPUT_NAME liang
 target_link_libraries(liang_exe liang_lib)
 
 file(GLOB TEST_SOURCES src/tests/*.cpp)
-add_executable(liang_test ${TEST_SOURCES})
+file(GLOB TEST_HEADERS src/tests/*.h)
+add_executable(liang_test ${TEST_SOURCES} ${TEST_HEADERS})
 set_target_properties(liang_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY /${CMAKE_BINARY_DIR}/bin/)
 target_link_libraries (liang_test liang_lib pthread libgtest)
