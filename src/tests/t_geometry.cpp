@@ -264,26 +264,26 @@ TEST(GeometryTest, Vector3CreateCoordSystem) {
   Vector3FloatEquals(vec3, -0.8, 0.6, 0.0);
 }
 
-void Point2IntEquals(liang::Point2i vec, int x, int y) {
-  ASSERT_EQ(vec.x, x);
-  ASSERT_EQ(vec.y, y);
+void Point2IntEquals(liang::Point2i point, int x, int y) {
+  ASSERT_EQ(point.x, x);
+  ASSERT_EQ(point.y, y);
 }
 
-void Point2FloatEquals(liang::Point2f vec, float x, float y) {
-  ASSERT_FLOAT_EQ(vec.x, x);
-  ASSERT_FLOAT_EQ(vec.y, y);
+void Point2FloatEquals(liang::Point2f point, float x, float y) {
+  ASSERT_FLOAT_EQ(point.x, x);
+  ASSERT_FLOAT_EQ(point.y, y);
 }
 
-void Point3IntEquals(liang::Point3i vec, int x, int y, int z) {
-  ASSERT_EQ(vec.x, x);
-  ASSERT_EQ(vec.y, y);
-  ASSERT_EQ(vec.z, z);
+void Point3IntEquals(liang::Point3i point, int x, int y, int z) {
+  ASSERT_EQ(point.x, x);
+  ASSERT_EQ(point.y, y);
+  ASSERT_EQ(point.z, z);
 }
 
-void Point3FloatEquals(liang::Point3f vec, float x, float y, float z) {
-  ASSERT_FLOAT_EQ(vec.x, x);
-  ASSERT_FLOAT_EQ(vec.y, y);
-  ASSERT_FLOAT_EQ(vec.z, z);
+void Point3FloatEquals(liang::Point3f point, float x, float y, float z) {
+  ASSERT_FLOAT_EQ(point.x, x);
+  ASSERT_FLOAT_EQ(point.y, y);
+  ASSERT_FLOAT_EQ(point.z, z);
 }
 
 TEST(GeometryTest, Point2Creation) {
@@ -416,4 +416,17 @@ TEST(GeometryTest, Point3LerpOutOfBounds) {
   liang::Point3f p2 = liang::Point3f(2.0, 3.0, 4.0);
   ASSERT_DEATH(liang::Lerp(p1, p2, -0.5), liang::ASSERTION_FAILURE);
   ASSERT_DEATH(liang::Lerp(p1, p2, 1.1), liang::ASSERTION_FAILURE);
+}
+
+void Normal3FloatEquals(liang::Normal3f normal, float x, float y, float z) {
+  ASSERT_FLOAT_EQ(normal.x, x);
+  ASSERT_FLOAT_EQ(normal.y, y);
+  ASSERT_FLOAT_EQ(normal.z, z);
+}
+
+TEST(GeometryTest, Normal3Creation) {
+  liang::Normal3f default_normal = liang::Normal3f();
+  Normal3FloatEquals(default_normal, 0.0, 0.0, 0.0);
+  liang::Normal3f initialized_normal = liang::Normal3f(-5.0, 5.0, -10.0);
+  Normal3FloatEquals(initialized_normal, -5.0, 5.0, -10.0);
 }

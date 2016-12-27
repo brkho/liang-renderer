@@ -456,6 +456,20 @@ inline Point3<T> Lerp(const Point3<T> &p1, const Point3<T> &p2, float t) {
 typedef Point3<int> Point3i;
 typedef Point3<float> Point3f;
 
+// A surface normal vector. This inherits from Vector3 since it is a specific type of Vector3.
+template <typename T>
+class Normal3 : public Vector3<T> {
+  public:
+    // Default constructor initializing components to 0.
+    Normal3() : Vector3<T>() {}
+
+    // Constructor initializing components to provided values.
+    Normal3(T x, T y, T z) : Vector3<T>(x, y, z) {}
+};
+
+// A type declaration for the most common useage of Normal3.
+typedef Normal3<float> Normal3f;
+
 }
 
 #endif  // LIANG_CORE_GEOMETRY_H
