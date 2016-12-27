@@ -18,10 +18,7 @@ class Vector2 {
     T x, y;
 
     // Default constructor for a Vector2 that initializes both x and y to 0.
-    Vector2() {
-      x = 0;
-      y = 0;
-    }
+    Vector2() : x{0}, y{0} {}
 
     // Constructor for a Vector2 that takes an x and y value.
     Vector2(T x, T y) : x(x), y(y) { assert(IsValid()); }
@@ -105,7 +102,7 @@ class Vector2 {
     }
 
     // Pretty prints a Vector2.
-    std::string ToString() {
+    std::string ToString() const {
       return "(" + std::to_string(x) + ", " + std::to_string(y) + ")";
     }
   private:
@@ -145,11 +142,7 @@ class Vector3 {
     T x, y, z;
 
     // Default constructor for a Vector3 that initializes x, y, and z to 0.
-    Vector3() {
-      x = 0;
-      y = 0;
-      z = 0;
-    }
+    Vector3() : x{0}, y{0}, z{0} {}
 
     // Constructor for a Vector3 that takes an x, y, and z value.
     Vector3(T x, T y, T z) : x(x), y(y), z(z) { assert(IsValid()); }
@@ -237,7 +230,7 @@ class Vector3 {
     }
 
     // Pretty prints a Vector3.
-    std::string ToString() {
+    std::string ToString() const {
       return "(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")";
     }
   private:
@@ -292,6 +285,176 @@ inline void CreateCoordSystem(const Vector3<T> &vec1, Vector3<T> *vec2, Vector3<
 // Some type declarations for common usages of Vector3.
 typedef Vector3<int> Vector3i;
 typedef Vector3<float> Vector3f;
+
+// A Point representing a position in 2D space.
+template <typename T>
+class Point2 {
+  public:
+    // The coordinates of the point.
+    T x, y;
+
+    // Default constructor initializing the Point2 to the origin.
+    Point2() : x{0}, y{0} {}
+
+    // Constructor initializing the Point2 with the provided values.
+    Point2(T x, T y) : x{x}, y{y} { assert(IsValid()); }
+
+    // Addition operator overload to offset a Point2 in a given direction represented by a Vector2
+    // returning a new Point2.
+    Point2<T> operator+(const Vector2<T> &that) const {
+      return Point2<T>(x + that.x, y + that.y);
+    }
+
+    // Addition assignment operator overload to offset the current Point2 in a given direction
+    // represented by a Vector2.
+    Point2<T> &operator+=(const Vector2<T> &that) {
+      x += that.x;
+      y += that.y;
+      assert(IsValid());
+      return *this;
+    }
+
+    // Subtraction operator overload to offset a Point2 in a given direction represented by a
+    // Vector2 returning a new Point2.
+    Point2<T> operator-(const Vector2<T> &that) const {
+      return Point2<T>(x - that.x, y - that.y);
+    }
+
+    // Subtraction assignment operator overload to offset the current Point2 in a given direction
+    // represented by a Vector2.
+    Point2<T> &operator-=(const Vector2<T> &that) {
+      x -= that.x;
+      y -= that.y;
+      assert(IsValid());
+      return *this;
+    }
+
+    // Subtraction operator overload to get the distance between the two points as a vector. I don't
+    // think we need to override the subtraction assignment operator as well...
+    Vector2<T> operator-(const Point2<T> &that) const {
+      return Vector2<T>(x - that.x, y - that.y);
+    }
+
+    // Pretty prints a Point2.
+    std::string ToString() const {
+      return "(" + std::to_string(x) + ", " + std::to_string(y) + ")";
+    }
+  private:
+    // Returns whether the Point2 is valid. This returns true if there are no NaNs, else false.
+    bool IsValid() const {
+      return !std::isnan(x) && !std::isnan(y);
+    }
+};
+
+// Gets the distance between two Point2s.
+template <typename T>
+inline float Distance(const Point2<T> &p1, const Point2<T> &p2) {
+  return (p1 - p2).Length();
+}
+
+// Gets the squared distance between two Point2s.
+template <typename T>
+inline float DistanceSquared(const Point2<T> &p1, const Point2<T> &p2) {
+  return (p1 - p2).LengthSquared();
+}
+
+// Linearly interpolates between two points (0.0 = p1, 1.0 = p2).
+template <typename T>
+inline Point2<T> Lerp(const Point2<T> &p1, const Point2<T> &p2, float t) {
+  assert(t >= 0.0 && t <= 1.0);
+  float t_inv = 1.0 - t;
+  return Point2<T>(p1.x * t_inv + p2.x * t, p1.y * t_inv + p2.y * t);
+}
+
+// Some type declarations for common usages of Point2.
+typedef Point2<int> Point2i;
+typedef Point2<float> Point2f;
+
+// A Point representing a position in 2D space.
+template <typename T>
+class Point3 {
+  public:
+    // The coordinates of the point.
+    T x, y, z;
+
+    // Default constructor initializing the Point3 to the origin.
+    Point3() : x{0}, y{0}, z{0} {}
+
+    // Constructor initializing the Point3 with the provided values.
+    Point3(T x, T y, T z) : x{x}, y{y}, z{z} { assert(IsValid()); }
+
+    // Addition operator overload to offset a Point3 in a given direction represented by a Vector3
+    // returning a new Point3.
+    Point3<T> operator+(const Vector3<T> &that) const {
+      return Point3<T>(x + that.x, y + that.y, z + that.z);
+    }
+
+    // Addition assignment operator overload to offset the current Point3 in a given direction
+    // represented by a Vector3.
+    Point3<T> &operator+=(const Vector3<T> &that) {
+      x += that.x;
+      y += that.y;
+      z += that.z;
+      assert(IsValid());
+      return *this;
+    }
+
+    // Subtraction operator overload to offset a Point3 in a given direction represented by a
+    // Vector3 returning a new Point3.
+    Point3<T> operator-(const Vector3<T> &that) const {
+      return Point3<T>(x - that.x, y - that.y, z - that.z);
+    }
+
+    // Subtraction assignment operator overload to offset the current Point3 in a given direction
+    // represented by a Vector3.
+    Point3<T> &operator-=(const Vector3<T> &that) {
+      x -= that.x;
+      y -= that.y;
+      z -= that.z;
+      assert(IsValid());
+      return *this;
+    }
+
+    // Subtraction operator overload to get the distance between the two points as a vector. I don't
+    // think we need to override the subtraction assignment operator as well...
+    Vector3<T> operator-(const Point3<T> &that) const {
+      return Vector3<T>(x - that.x, y - that.y, z - that.z);
+    }
+
+    // Pretty prints a Point3.
+    std::string ToString() const {
+      return "(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")";
+    }
+  private:
+    // Returns whether the Point3 is valid. This returns true if there are no NaNs, else false.
+    bool IsValid() const {
+      return !std::isnan(x) && !std::isnan(y) && !std::isnan(z);
+    }
+};
+
+// Gets the distance between two Point3s.
+template <typename T>
+inline float Distance(const Point3<T> &p1, const Point3<T> &p2) {
+  return (p1 - p2).Length();
+}
+
+// Gets the squared distance between two Point3s.
+template <typename T>
+inline float DistanceSquared(const Point3<T> &p1, const Point3<T> &p2) {
+  return (p1 - p2).LengthSquared();
+}
+
+// Linearly interpolates between two points (0.0 = p1, 1.0 = p2).
+template <typename T>
+inline Point3<T> Lerp(const Point3<T> &p1, const Point3<T> &p2, float t) {
+  assert(t >= 0.0 && t <= 1.0);
+  float t_inv = 1.0 - t;
+  return Point3<T>(p1.x * t_inv + p2.x * t, p1.y * t_inv + p2.y * t, p1.z * t_inv + p2.z * t);
+}
+
+// Some type declarations for common usages of Point3.
+typedef Point3<int> Point3i;
+typedef Point3<float> Point3f;
 
 }
 

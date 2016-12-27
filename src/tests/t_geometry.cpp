@@ -263,3 +263,157 @@ TEST(GeometryTest, Vector3CreateCoordSystem) {
   Vector3FloatEquals(vec2, 0.0, 0.0, -1.0);
   Vector3FloatEquals(vec3, -0.8, 0.6, 0.0);
 }
+
+void Point2IntEquals(liang::Point2i vec, int x, int y) {
+  ASSERT_EQ(vec.x, x);
+  ASSERT_EQ(vec.y, y);
+}
+
+void Point2FloatEquals(liang::Point2f vec, float x, float y) {
+  ASSERT_FLOAT_EQ(vec.x, x);
+  ASSERT_FLOAT_EQ(vec.y, y);
+}
+
+void Point3IntEquals(liang::Point3i vec, int x, int y, int z) {
+  ASSERT_EQ(vec.x, x);
+  ASSERT_EQ(vec.y, y);
+  ASSERT_EQ(vec.z, z);
+}
+
+void Point3FloatEquals(liang::Point3f vec, float x, float y, float z) {
+  ASSERT_FLOAT_EQ(vec.x, x);
+  ASSERT_FLOAT_EQ(vec.y, y);
+  ASSERT_FLOAT_EQ(vec.z, z);
+}
+
+TEST(GeometryTest, Point2Creation) {
+  liang::Point2i default_int_point = liang::Point2i();
+  Point2IntEquals(default_int_point, 0, 0);
+  liang::Point2i initialized_int_point = liang::Point2i(-5, 5);
+  Point2IntEquals(initialized_int_point, -5, 5);
+
+  liang::Point2f default_float_point = liang::Point2f();
+  Point2FloatEquals(default_float_point, 0.0, 0.0);
+  liang::Point2f initialized_float_point = liang::Point2f(-5.0, 5.0);
+  Point2FloatEquals(initialized_float_point, -5.0, 5.0);
+}
+
+TEST(GeometryTest, Point2Addition) {
+  liang::Point2f point = liang::Point2f(1.0, 2.0);
+  liang::Vector2f vector = liang::Vector2f(0.5, 0.6);
+  liang::Point2f translated = point + vector;
+  Point2FloatEquals(point, 1.0, 2.0);
+  Point2FloatEquals(translated, 1.5, 2.6);
+
+  point += vector;
+  Point2FloatEquals(point, 1.5, 2.6);
+  Vector2FloatEquals(vector, 0.5, 0.6);
+}
+
+TEST(GeometryTest, Point2VectorSubtraction) {
+  liang::Point2f point = liang::Point2f(1.0, 2.0);
+  liang::Vector2f vector = liang::Vector2f(0.5, 0.6);
+  liang::Point2f translated = point - vector;
+  Point2FloatEquals(point, 1.0, 2.0);
+  Point2FloatEquals(translated, 0.5, 1.4);
+
+  point -= vector;
+  Point2FloatEquals(point, 0.5, 1.4);
+  Vector2FloatEquals(vector, 0.5, 0.6);
+}
+
+TEST(GeometryTest, Point2PointSubtraction) {
+  liang::Point2f p1 = liang::Point2f(1.0, 2.0);
+  liang::Point2f p2 = liang::Point2f(0.5, -0.5);
+  Vector2FloatEquals(p1 - p2, 0.5, 2.5);
+}
+
+TEST(GeometryTest, Point2Distance) {
+  liang::Point2f p1 = liang::Point2f(1.0, 2.0);
+  liang::Point2f p2 = liang::Point2f(4.0, -2.0);
+  ASSERT_FLOAT_EQ(5.0, liang::Distance(p1, p2));
+  ASSERT_FLOAT_EQ(25.0, liang::DistanceSquared(p1, p2));
+}
+
+TEST(GeometryTest, Point2Lerp) {
+  liang::Point2f p1 = liang::Point2f(1.0, 2.0);
+  liang::Point2f p2 = liang::Point2f(2.0, 3.0);
+  Point2FloatEquals(liang::Lerp(p1, p2, 0.0), 1.0, 2.0);
+  Point2FloatEquals(liang::Lerp(p1, p2, 0.25), 1.25, 2.25);
+  Point2FloatEquals(liang::Lerp(p1, p2, 0.5), 1.5, 2.5);
+  Point2FloatEquals(liang::Lerp(p1, p2, 0.75), 1.75, 2.75);
+  Point2FloatEquals(liang::Lerp(p1, p2, 1.0), 2.0, 3.0);
+}
+
+TEST(GeometryTest, Point2LerpOutOfBounds) {
+  liang::Point2f p1 = liang::Point2f(1.0, 2.0);
+  liang::Point2f p2 = liang::Point2f(2.0, 3.0);
+  ASSERT_DEATH(liang::Lerp(p1, p2, -0.5), liang::ASSERTION_FAILURE);
+  ASSERT_DEATH(liang::Lerp(p1, p2, 1.1), liang::ASSERTION_FAILURE);
+}
+
+TEST(GeometryTest, Point3Creation) {
+  liang::Point3i default_int_point = liang::Point3i();
+  Point3IntEquals(default_int_point, 0, 0, 0);
+  liang::Point3i initialized_int_point = liang::Point3i(-5, 5, -10);
+  Point3IntEquals(initialized_int_point, -5, 5, -10);
+
+  liang::Point3f default_float_point = liang::Point3f();
+  Point3FloatEquals(default_float_point, 0.0, 0.0, 0.0);
+  liang::Point3f initialized_float_point = liang::Point3f(-5.0, 5.0, -10.0);
+  Point3FloatEquals(initialized_float_point, -5.0, 5.0, -10.0);
+}
+
+TEST(GeometryTest, Point3Addition) {
+  liang::Point3f point = liang::Point3f(1.0, 2.0, 3.0);
+  liang::Vector3f vector = liang::Vector3f(0.5, 0.6, 0.7);
+  liang::Point3f translated = point + vector;
+  Point3FloatEquals(point, 1.0, 2.0, 3.0);
+  Point3FloatEquals(translated, 1.5, 2.6, 3.7);
+
+  point += vector;
+  Point3FloatEquals(point, 1.5, 2.6, 3.7);
+  Vector3FloatEquals(vector, 0.5, 0.6, 0.7);
+}
+
+TEST(GeometryTest, Point3VectorSubtraction) {
+  liang::Point3f point = liang::Point3f(1.0, 2.0, 3.0);
+  liang::Vector3f vector = liang::Vector3f(0.5, 0.6, 0.7);
+  liang::Point3f translated = point - vector;
+  Point3FloatEquals(point, 1.0, 2.0, 3.0);
+  Point3FloatEquals(translated, 0.5, 1.4, 2.3);
+
+  point -= vector;
+  Point3FloatEquals(point, 0.5, 1.4, 2.3);
+  Vector3FloatEquals(vector, 0.5, 0.6, 0.7);
+}
+
+TEST(GeometryTest, Point3PointSubtraction) {
+  liang::Point3f p1 = liang::Point3f(1.0, 2.0, 3.0);
+  liang::Point3f p2 = liang::Point3f(0.5, -0.5, 1.0);
+  Vector3FloatEquals(p1 - p2, 0.5, 2.5, 2.0);
+}
+
+TEST(GeometryTest, Point3Distance) {
+  liang::Point3f p1 = liang::Point3f(4.0, 6.0, 8.0);
+  liang::Point3f p2 = liang::Point3f(3.0, 4.0, 5.0);
+  ASSERT_FLOAT_EQ(3.74165738, liang::Distance(p1, p2));
+  ASSERT_FLOAT_EQ(14.0, liang::DistanceSquared(p1, p2));
+}
+
+TEST(GeometryTest, Point3Lerp) {
+  liang::Point3f p1 = liang::Point3f(1.0, 2.0, 3.0);
+  liang::Point3f p2 = liang::Point3f(2.0, 3.0, 4.0);
+  Point3FloatEquals(liang::Lerp(p1, p2, 0.0), 1.0, 2.0, 3.0);
+  Point3FloatEquals(liang::Lerp(p1, p2, 0.25), 1.25, 2.25, 3.25);
+  Point3FloatEquals(liang::Lerp(p1, p2, 0.5), 1.5, 2.5, 3.5);
+  Point3FloatEquals(liang::Lerp(p1, p2, 0.75), 1.75, 2.75, 3.75);
+  Point3FloatEquals(liang::Lerp(p1, p2, 1.0), 2.0, 3.0, 4.0);
+}
+
+TEST(GeometryTest, Point3LerpOutOfBounds) {
+  liang::Point3f p1 = liang::Point3f(1.0, 2.0, 3.0);
+  liang::Point3f p2 = liang::Point3f(2.0, 3.0, 4.0);
+  ASSERT_DEATH(liang::Lerp(p1, p2, -0.5), liang::ASSERTION_FAILURE);
+  ASSERT_DEATH(liang::Lerp(p1, p2, 1.1), liang::ASSERTION_FAILURE);
+}
