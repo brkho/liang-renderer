@@ -430,3 +430,35 @@ TEST(GeometryTest, Normal3Creation) {
   liang::Normal3f initialized_normal = liang::Normal3f(-5.0, 5.0, -10.0);
   Normal3FloatEquals(initialized_normal, -5.0, 5.0, -10.0);
 }
+
+TEST(GeometryTest, Ray3fCreation) {
+  liang::Point3f origin = liang::Point3f(1.0, 2.0, 3.0);
+  liang::Vector3f direction = liang::Vector3f(0.1, 0.2, 0.3);
+  liang::Ray3f ray1 = liang::Ray3f(origin, direction, 5.0);
+  Point3FloatEquals(ray1.origin, 1.0, 2.0, 3.0);
+  Vector3FloatEquals(ray1.direction, 0.1, 0.2, 0.3);
+  ASSERT_FLOAT_EQ(ray1.max_t, 5.0);
+
+  liang::Ray3f ray2 = liang::Ray3f(origin, direction);
+  Point3FloatEquals(ray2.origin, 1.0, 2.0, 3.0);
+  Vector3FloatEquals(ray2.direction, 0.1, 0.2, 0.3);
+  ASSERT_FLOAT_EQ(ray2.max_t, std::numeric_limits<float>::infinity());
+}
+
+TEST(GeometryTest, Ray3fParameterization) {
+  liang::Point3f origin = liang::Point3f(1.0, 2.0, 3.0);
+  liang::Vector3f direction = liang::Vector3f(0.1, 0.2, 0.3);
+  liang::Ray3f ray = liang::Ray3f(origin, direction);
+  Point3FloatEquals(ray(0.0), 1.0, 2.0, 3.0);
+  Point3FloatEquals(ray(1.0), 1.1, 2.2, 3.3);
+  Point3FloatEquals(ray(2.0), 1.2, 2.4, 3.6);
+  Point3FloatEquals(ray(10.0), 2.0, 4.0, 6.0);
+}
+
+TEST(GeometryTest, Ray3fParameterizationOutOfBounds) {
+  liang::Point3f origin = liang::Point3f(1.0, 2.0, 3.0);
+  liang::Vector3f direction = liang::Vector3f(0.1, 0.2, 0.3);
+  liang::Ray3f ray = liang::Ray3f(origin, direction, 5.0);
+  ASSERT_DEATH(ray(-1.0), liang::ASSERTION_FAILURE);
+  ASSERT_DEATH(liang::Ray3f(origin, direction, -5.0), liang::ASSERTION_FAILURE);
+}

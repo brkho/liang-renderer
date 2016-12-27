@@ -470,6 +470,34 @@ class Normal3 : public Vector3<T> {
 // A type declaration for the most common useage of Normal3.
 typedef Normal3<float> Normal3f;
 
+// A Ray3f consists of an origin point represented as a Point3 and a direction represented as a
+// Vector3.
+class Ray3f {
+  public:
+    // The origin of the ray.
+    Point3f origin;
+    // The direction of the ray.
+    Vector3f direction;
+    // The maximum value for t recorded.
+    mutable float max_t;
+
+    // Construct a ray given an origin, a direction, and a max t value.
+    Ray3f(Point3f origin, Vector3f direction, float max_t) : origin{origin}, direction{direction},
+        max_t{max_t} {
+      assert(max_t >= 0.0);
+    }
+
+    // Construct a ray given an origin and a direction, initialing max t to infinity.
+    Ray3f(Point3f origin, Vector3f direction) : Ray3f(origin, direction,
+        std::numeric_limits<float>::infinity()) {}
+
+    // Parameterized by t, return the point that the ray represents.
+    Point3f operator()(float t) const {
+      assert(t >= 0.0);
+      return origin + (direction * t);
+    }
+};
+
 }
 
 #endif  // LIANG_CORE_GEOMETRY_H
