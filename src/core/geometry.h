@@ -299,6 +299,18 @@ class Point2 {
     // Constructor initializing the Point2 with the provided values.
     Point2(T x, T y) : x{x}, y{y} { assert(IsValid()); }
 
+    // Accessing via integer index for reading.
+    T operator[](int i) const {
+      assert(i == 0 || i == 1);
+      return i == 0 ? x : y;
+    }
+
+    // Accessing via integer index for assignment.
+    T &operator[](int i) {
+      assert(i == 0 || i == 1);
+      return i == 0 ? x : y;
+    }
+
     // Addition operator overload to offset a Point2 in a given direction represented by a Vector2
     // returning a new Point2.
     Point2<T> operator+(const Vector2<T> &that) const {
@@ -382,6 +394,18 @@ class Point3 {
 
     // Constructor initializing the Point3 with the provided values.
     Point3(T x, T y, T z) : x{x}, y{y}, z{z} { assert(IsValid()); }
+
+    // Accessing via integer index for reading.
+    T operator[](int i) const {
+      assert(i >= 0 && i <= 2);
+      return i == 0 ? x : (i == 1 ? y : z);
+    }
+
+    // Accessing via integer index for assignment.
+    T &operator[](int i) {
+      assert(i >= 0 && i <= 2);
+      return i == 0 ? x : (i == 1 ? y : z);
+    }
 
     // Addition operator overload to offset a Point3 in a given direction represented by a Vector3
     // returning a new Point3.
@@ -496,7 +520,145 @@ class Ray3f {
       assert(t >= 0.0);
       return origin + (direction * t);
     }
+
+    // Pretty prints a Ray3f.
+    std::string ToString() const {
+      return "(o: " + origin.ToString() + ", d: " + direction.ToString() + ")";
+    }
 };
+
+// An axis-aligned bounding box described by two points.
+template <typename T>
+class AABB3 {
+  public:
+    // The minimum and maximum points describing the AABB. Every component of the min_point must
+    // be less than or equal to its corresponding component in the max_point.
+    Point3<T> min_point, max_point;
+
+    // Doesn't make sense to initialize an AABB3 without without a point, so disable default
+    // constructor.
+    AABB3() = delete;
+
+    // Initialize an AABB enclosing a single point.
+    AABB3(const Point3<T> &point) : min_point(point), max_point(point) {}
+
+    // Initialize an AABB defined by two points, taking the component-wise minimum and maximum
+    // to get min_point and max_point.
+    AABB3(const Point3<T> &p1, const Point3<T> &p2) : min_point{std::min(p1.x, p2.x),
+        std::min(p1.y, p2.y), std::min(p1.z, p2.z)}, max_point{std::max(p1.x, p2.x),
+        std::max(p1.y, p2.y), std::max(p1.z, p2.z)} {}
+
+    // Returns one of the 8 corners of the AABB.
+    Point3<T> Corner(uint i) const {
+      assert(i < 8);
+      bool use_min_x = !(bool)(i / 4);
+      bool use_min_y = !(bool)((i % 4) / 2);
+      bool use_min_z = !(bool)(i % 2);
+      return Point3<T>(use_min_x ? min_point.x : max_point.x, use_min_y ? min_point.y : max_point.y,
+          use_min_z ? min_point.z : max_point.z);
+    }
+
+    // Every component of the min_point must be less than or equal to its corresponding component
+    // in the max_point, else the AABB is considered empty.
+    bool IsEmpty() const {
+      return min_point.x > max_point.x || min_point.y > max_point.y || min_point.z > max_point.z;
+    }
+
+    // Expands the AABB3 in all directions by a given delta.
+    void Expand(T delta) {
+      min_point -= Vector3<T>(delta, delta, delta);
+      max_point += Vector3<T>(delta, delta, delta);
+    }
+
+    // Returnds the vector along the diagonal of the AABB.
+    Vector3<T> Diagonal() const {
+      if (IsEmpty()) {
+        return Vector3<T>();
+      }
+      return max_point - min_point;
+    }
+
+    // Returns the surface area of the bounding box.
+    T SurfaceArea() const {
+      Vector3<T> d = Diagonal();
+      return 2 * (d.x * d.y + d.x * d.z + d.y * d.z);
+    }
+
+    // Returns the volume of the bounding box.
+    T Volume() const {
+      Vector3<T> d = Diagonal();
+      return d.x * d.y * d.z;
+    }
+
+    // Pretty prints an AABB3.
+    std::string ToString() const {
+      return "(min: " + min_point.ToString() + ", max: " + max_point.ToString() + ")";
+    }
+};
+
+// Computes the union of two AABBs, an AABB that encloses both.
+template <typename T>
+AABB3<T> Union(const AABB3<T> &b1, const AABB3<T> &b2) {
+  // A union with an empty AABB is a no-op.
+  if (b1.IsEmpty()) {
+    return b2;
+  }
+  if (b2.IsEmpty()) {
+    return b1;
+  }
+  Point3<T> new_min = Point3<T>(std::min(b1.min_point.x, b2.min_point.x),
+      std::min(b1.min_point.y, b2.min_point.y), std::min(b1.min_point.z, b2.min_point.z));
+  Point3<T> new_max = Point3<T>(std::max(b1.max_point.x, b2.max_point.x),
+      std::max(b1.max_point.y, b2.max_point.y), std::max(b1.max_point.z, b2.max_point.z));
+  return AABB3<T>(new_min, new_max);
+}
+
+// Computes the intersection of two AABBs. This may result in an invalid AABB representing no
+// intersection.
+template <typename T>
+AABB3<T> Intersect(const AABB3<T> &b1, const AABB3<T> &b2) {
+  // An intersection with an empty AABB returns an empty AABB.
+  if (b1.IsEmpty()) {
+    return b1;
+  }
+  if (b2.IsEmpty()) {
+    return b2;
+  }
+  Point3<T> new_min = Point3<T>(std::max(b1.min_point.x, b2.min_point.x),
+      std::max(b1.min_point.y, b2.min_point.y), std::max(b1.min_point.z, b2.min_point.z));
+  Point3<T> new_max = Point3<T>(std::min(b1.max_point.x, b2.max_point.x),
+      std::min(b1.max_point.y, b2.max_point.y), std::min(b1.max_point.z, b2.max_point.z));
+  // A bit of a strange construction here to maintain empty AABB state.
+  AABB3<T> new_box = AABB3<T>(new_min);
+  new_box.max_point = new_max;
+  return new_box;
+}
+
+// Returns whether the bouding boxes overlap.
+template <typename T>
+bool Overlaps(const AABB3<T> &b1, const AABB3<T> &b2) {
+  if (b1.IsEmpty() || b2.IsEmpty()) {
+    return false;
+  }
+  return ((b1.max_point.x >= b2.min_point.x && b1.min_point.x <= b2.max_point.x) &&
+      (b1.max_point.y >= b2.min_point.y && b1.min_point.y <= b2.max_point.y) &&
+      (b1.max_point.z >= b2.min_point.z && b1.min_point.z <= b2.max_point.z));
+}
+
+// Returns whether the point is inside the bounding box.
+template <typename T>
+bool Contains(const AABB3<T> &box, const Point3<T> &point) {
+  if (box.IsEmpty()) {
+    return false;
+  }
+  return point.x >= box.min_point.x && point.x <= box.max_point.x &&
+      point.y >= box.min_point.y && point.y <= box.max_point.y &&
+      point.z >= box.min_point.z && point.z <= box.max_point.z;
+}
+
+// Some type declarations for common usages of AABB3.
+typedef AABB3<int> AABB3i;
+typedef AABB3<float> AABB3f;
 
 }
 

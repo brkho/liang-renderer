@@ -298,6 +298,22 @@ TEST(GeometryTest, Point2Creation) {
   Point2FloatEquals(initialized_float_point, -5.0, 5.0);
 }
 
+TEST(GeometryTest, Point2Indexing) {
+  liang::Point2i vec = liang::Point2i(1, 2);
+  Point2IntEquals(vec, vec[0], vec[1]);
+  vec[0] = 3;
+  vec[1] = 4;
+  Point2IntEquals(vec, 3, 4);
+}
+
+TEST(GeometryTest, Point2IndexingOutOfBounds) {
+  liang::Point2i vec = liang::Point2i(1, 2);
+  ASSERT_DEATH(vec[-1], liang::ASSERTION_FAILURE);
+  ASSERT_DEATH(vec[2], liang::ASSERTION_FAILURE);
+  ASSERT_DEATH({ vec[-1] = 5; }, liang::ASSERTION_FAILURE);
+  ASSERT_DEATH({ vec[2] = 5; }, liang::ASSERTION_FAILURE);
+}
+
 TEST(GeometryTest, Point2Addition) {
   liang::Point2f point = liang::Point2f(1.0, 2.0);
   liang::Vector2f vector = liang::Vector2f(0.5, 0.6);
@@ -363,6 +379,24 @@ TEST(GeometryTest, Point3Creation) {
   liang::Point3f initialized_float_point = liang::Point3f(-5.0, 5.0, -10.0);
   Point3FloatEquals(initialized_float_point, -5.0, 5.0, -10.0);
 }
+
+TEST(GeometryTest, Point3Indexing) {
+  liang::Point3i vec = liang::Point3i(1, 2, 3);
+  Point3IntEquals(vec, vec[0], vec[1], vec[2]);
+  vec[0] = 4;
+  vec[1] = 5;
+  vec[2] = 6;
+  Point3IntEquals(vec, 4, 5, 6);
+}
+
+TEST(GeometryTest, Point3IndexingOutOfBounds) {
+  liang::Point3i vec = liang::Point3i(1, 2, 3);
+  ASSERT_DEATH(vec[-1], liang::ASSERTION_FAILURE);
+  ASSERT_DEATH(vec[3], liang::ASSERTION_FAILURE);
+  ASSERT_DEATH({ vec[-1] = 5; }, liang::ASSERTION_FAILURE);
+  ASSERT_DEATH({ vec[3] = 5; }, liang::ASSERTION_FAILURE);
+}
+
 
 TEST(GeometryTest, Point3Addition) {
   liang::Point3f point = liang::Point3f(1.0, 2.0, 3.0);
@@ -461,4 +495,153 @@ TEST(GeometryTest, Ray3fParameterizationOutOfBounds) {
   liang::Ray3f ray = liang::Ray3f(origin, direction, 5.0);
   ASSERT_DEATH(ray(-1.0), liang::ASSERTION_FAILURE);
   ASSERT_DEATH(liang::Ray3f(origin, direction, -5.0), liang::ASSERTION_FAILURE);
+}
+
+void AABB3FloatEquals(liang::AABB3f box, float min_x, float min_y, float min_z, float max_x,
+    float max_y, float max_z) {
+  ASSERT_FLOAT_EQ(min_x, box.min_point.x);
+  ASSERT_FLOAT_EQ(min_y, box.min_point.y);
+  ASSERT_FLOAT_EQ(min_z, box.min_point.z);
+  ASSERT_FLOAT_EQ(max_x, box.max_point.x);
+  ASSERT_FLOAT_EQ(max_y, box.max_point.y);
+  ASSERT_FLOAT_EQ(max_z, box.max_point.z);
+}
+
+TEST(GeometryTest, AABB3Creation) {
+  liang::AABB3f box = liang::AABB3f(liang::Point3f(1.0, 2.0, 3.0));
+  AABB3FloatEquals(box, 1.0, 2.0, 3.0, 1.0, 2.0, 3.0);
+  box = liang::AABB3f(liang::Point3f(1.0, 2.0, 3.0), liang::Point3f(0.5, 1.2, 3.3));
+  AABB3FloatEquals(box, 0.5, 1.2, 3.0, 1.0, 2.0, 3.3);
+  box = liang::AABB3f(liang::Point3f(1.1, 1.2, 1.3), liang::Point3f(0.1, 0.2, 0.3));
+  AABB3FloatEquals(box, 0.1, 0.2, 0.3, 1.1, 1.2, 1.3);
+  box = liang::AABB3f(liang::Point3f(0.1, 0.2, 0.3), liang::Point3f(1.1, 1.2, 1.3));
+  AABB3FloatEquals(box, 0.1, 0.2, 0.3, 1.1, 1.2, 1.3);
+}
+
+TEST(GeometryTest, AABB3Corner) {
+  liang::AABB3f box = liang::AABB3f(liang::Point3f(1.0, 1.0, 1.0), liang::Point3f(2.0, 2.0, 2.0));
+  Point3FloatEquals(box.Corner(0), 1.0, 1.0, 1.0);
+  Point3FloatEquals(box.Corner(1), 1.0, 1.0, 2.0);
+  Point3FloatEquals(box.Corner(2), 1.0, 2.0, 1.0);
+  Point3FloatEquals(box.Corner(3), 1.0, 2.0, 2.0);
+  Point3FloatEquals(box.Corner(4), 2.0, 1.0, 1.0);
+  Point3FloatEquals(box.Corner(5), 2.0, 1.0, 2.0);
+  Point3FloatEquals(box.Corner(6), 2.0, 2.0, 1.0);
+  Point3FloatEquals(box.Corner(7), 2.0, 2.0, 2.0);
+}
+
+TEST(GeometryTest, AABB3CornerOutOfBounds) {
+  liang::AABB3f box = liang::AABB3f(liang::Point3f(1.0, 2.0, 1.0), liang::Point3f(2.0, 1.0, 2.0));
+  ASSERT_DEATH(box.Corner(8), liang::ASSERTION_FAILURE);
+}
+
+TEST(GeometryTest, AABB3IsEmpty) {
+  liang::AABB3f box = liang::AABB3f(liang::Point3f(1.0, 1.0, 1.0));
+  ASSERT_FALSE(box.IsEmpty());
+  box.max_point = liang::Point3f(0.0, 0.0, 0.0);
+  ASSERT_TRUE(box.IsEmpty());
+}
+
+TEST(GeometryTest, AABB3Expand) {
+  liang::AABB3f box = liang::AABB3f(liang::Point3f(1.0, 1.0, 1.0), liang::Point3f(2.0, 2.0, 2.0));
+  box.Expand(0.5);
+  AABB3FloatEquals(box, 0.5, 0.5, 0.5, 2.5, 2.5, 2.5);
+}
+
+TEST(GeometryTest, AABB3Diagonal) {
+  liang::AABB3f box = liang::AABB3f(liang::Point3f(1.0, 1.0, 1.0), liang::Point3f(2.0, 2.0, 2.0));
+  Vector3FloatEquals(box.Diagonal(), 1.0, 1.0, 1.0);
+  box.max_point = liang::Point3f();
+  Vector3FloatEquals(box.Diagonal(), 0.0, 0.0, 0.0);
+}
+
+TEST(GeometryTest, AABB3SurfaceArea) {
+  liang::AABB3f box = liang::AABB3f(liang::Point3f(1.0, 1.0, 1.0), liang::Point3f(3.0, 4.0, 5.0));
+  ASSERT_FLOAT_EQ(52.0, box.SurfaceArea());
+  box.max_point = liang::Point3f();
+  ASSERT_FLOAT_EQ(0.0, box.SurfaceArea());
+}
+
+TEST(GeometryTest, AABB3Volume) {
+  liang::AABB3f box = liang::AABB3f(liang::Point3f(1.0, 1.0, 1.0), liang::Point3f(3.0, 4.0, 5.0));
+  ASSERT_FLOAT_EQ(24.0, box.Volume());
+  box.max_point = liang::Point3f();
+  ASSERT_FLOAT_EQ(0.0, box.Volume());
+}
+
+TEST(GeometryTest, AABB3Union) {
+  // Partial intersection.
+  liang::AABB3f b1 = liang::AABB3f(liang::Point3f(2.0, 2.0, 2.0), liang::Point3f(8.0, 8.0, 8.0));
+  liang::AABB3f b2 = liang::AABB3f(liang::Point3f(0.0, 3.0, 0.0), liang::Point3f(3.0, 9.0, 5.0));
+  AABB3FloatEquals(liang::Union(b1, b2), 0.0, 2.0, 0.0, 8.0, 9.0, 8.0);
+  // Full intersection.
+  b1 = liang::AABB3f(liang::Point3f(2.0, 2.0, 2.0), liang::Point3f(8.0, 8.0, 8.0));
+  b2 = liang::AABB3f(liang::Point3f(3.0, 3.0, 3.0), liang::Point3f(7.0, 7.0, 7.0));
+  AABB3FloatEquals(liang::Union(b1, b2), 2.0, 2.0, 2.0, 8.0, 8.0, 8.0);
+  // The second bounding box is invalid.
+  b2.max_point = liang::Point3f(0.0, 0.0, 0.0);
+  AABB3FloatEquals(liang::Union(b1, b2), b1.min_point.x, b1.min_point.y, b1.min_point.z,
+      b1.max_point.x, b1.max_point.y, b1.max_point.z);
+  // Disjoint.
+  b1 = liang::AABB3f(liang::Point3f(2.0, 2.0, 2.0), liang::Point3f(8.0, 8.0, 8.0));
+  b2 = liang::AABB3f(liang::Point3f(0.0, 0.0, 0.0), liang::Point3f(1.0, 1.0, 1.0));
+  AABB3FloatEquals(liang::Union(b1, b2), 0.0, 0.0, 0.0, 8.0, 8.0, 8.0);
+  // The first bounding box is invalid.
+  b1.max_point = liang::Point3f(0.0, 0.0, 0.0);
+  AABB3FloatEquals(liang::Union(b1, b2), b2.min_point.x, b2.min_point.y, b2.min_point.z,
+      b2.max_point.x, b2.max_point.y, b2.max_point.z);
+}
+
+TEST(GeometryTest, AABB3Intersect) {
+  // Partial intersection.
+  liang::AABB3f b1 = liang::AABB3f(liang::Point3f(2.0, 2.0, 2.0), liang::Point3f(8.0, 8.0, 8.0));
+  liang::AABB3f b2 = liang::AABB3f(liang::Point3f(0.0, 3.0, 0.0), liang::Point3f(3.0, 9.0, 5.0));
+  AABB3FloatEquals(liang::Intersect(b1, b2), 2.0, 3.0, 2.0, 3.0, 8.0, 5.0);
+  // Full intersection.
+  b1 = liang::AABB3f(liang::Point3f(2.0, 2.0, 2.0), liang::Point3f(8.0, 8.0, 8.0));
+  b2 = liang::AABB3f(liang::Point3f(3.0, 3.0, 3.0), liang::Point3f(7.0, 7.0, 7.0));
+  AABB3FloatEquals(liang::Intersect(b1, b2), 3.0, 3.0, 3.0, 7.0, 7.0, 7.0);
+  // The second bounding box is invalid.
+  b2.max_point = liang::Point3f(0.0, 0.0, 0.0);
+  ASSERT_TRUE(liang::Intersect(b1, b2).IsEmpty());
+  // Disjoint.
+  b1 = liang::AABB3f(liang::Point3f(2.0, 2.0, 2.0), liang::Point3f(8.0, 8.0, 8.0));
+  b2 = liang::AABB3f(liang::Point3f(0.0, 0.0, 0.0), liang::Point3f(1.0, 1.0, 1.0));
+  ASSERT_TRUE(liang::Intersect(b1, b2).IsEmpty());
+  // The first bounding box is invalid.
+  b1.max_point = liang::Point3f(0.0, 0.0, 0.0);
+  ASSERT_TRUE(liang::Intersect(b1, b2).IsEmpty());
+}
+
+TEST(GeometryTest, AABB3Overlaps) {
+  // Partial intersection.
+  liang::AABB3f b1 = liang::AABB3f(liang::Point3f(2.0, 2.0, 2.0), liang::Point3f(8.0, 8.0, 8.0));
+  liang::AABB3f b2 = liang::AABB3f(liang::Point3f(0.0, 3.0, 0.0), liang::Point3f(3.0, 9.0, 5.0));
+  ASSERT_TRUE(liang::Overlaps(b1, b2));
+  // Full intersection.
+  b1 = liang::AABB3f(liang::Point3f(2.0, 2.0, 2.0), liang::Point3f(8.0, 8.0, 8.0));
+  b2 = liang::AABB3f(liang::Point3f(3.0, 3.0, 3.0), liang::Point3f(7.0, 7.0, 7.0));
+  ASSERT_TRUE(liang::Overlaps(b1, b2));
+  // The second bounding box is invalid.
+  b2.max_point = liang::Point3f(0.0, 0.0, 0.0);
+  ASSERT_FALSE(liang::Overlaps(b1, b2));
+  // Disjoint.
+  b1 = liang::AABB3f(liang::Point3f(2.0, 2.0, 2.0), liang::Point3f(8.0, 8.0, 8.0));
+  b2 = liang::AABB3f(liang::Point3f(0.0, 0.0, 0.0), liang::Point3f(1.0, 1.0, 1.0));
+  ASSERT_FALSE(liang::Overlaps(b1, b2));
+  // The first bounding box is invalid.
+  b1.max_point = liang::Point3f(0.0, 0.0, 0.0);
+  ASSERT_FALSE(liang::Overlaps(b1, b2));
+}
+
+TEST(GeometryTest, AABB3Contains) {
+  liang::AABB3f box = liang::AABB3f(liang::Point3f(2.0, 2.0, 2.0), liang::Point3f(8.0, 8.0, 8.0));
+  ASSERT_TRUE(liang::Contains(box, liang::Point3f(3.0, 3.0, 3.0)));
+  ASSERT_FALSE(liang::Contains(box, liang::Point3f(3.0, 10.0, 3.0)));
+  ASSERT_TRUE(liang::Contains(box, liang::Point3f(2.0, 2.0, 2.0)));
+  // Invalid AABB3.
+  box.max_point = liang::Point3f(0.0, 0.0, 0.0);
+  ASSERT_FALSE(liang::Contains(box, liang::Point3f(0.0, 0.0, 0.0)));
+  ASSERT_FALSE(liang::Contains(box, liang::Point3f(1.0, 1.0, 1.0)));
+  ASSERT_FALSE(liang::Contains(box, liang::Point3f(2.0, 2.0, 2.0)));
 }
