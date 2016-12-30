@@ -78,6 +78,31 @@ class Transform {
     // Returns a transform that is the transpose of the one provided.
     friend Transform Transpose(const Transform &t);
 
+    // Transforms a point by multiplying the point with the matrix.
+    template <typename T>
+    Point3<T> operator()(const Point3<T> &p) const;
+
+    // Transforms a vector by multiplying the vector with the matrix. Vectors are not affected by
+    // translation.
+    template <typename T>
+    Vector3<T> operator()(const Vector3<T> &v) const;
+
+    // Transforms a normal by multiplying with the transpose of the inverse of the matrix. Normals
+    // are a special case of vectors, so they are likewise not affected by translation.
+    template <typename T>
+    Normal3<T> operator()(const Normal3<T> &n) const;
+
+    // Transforms a ray by transforming its origin and direction.
+    Ray3f operator()(const Ray3f &r) const;
+
+    // Transforms a bounding box by transforming each one of its corners and computing a new
+    // bounding box that encompasses the resulting points.
+    template <typename T>
+    AABB3<T> operator()(const AABB3<T> &b) const;
+
+    // Multiply two Transforms together (aka multiplying their matrices) to compose them.
+    Transform operator*(const Transform &that) const;
+
   private:
     // The matrix backing the transform and its inverse.
     Matrix4x4 matrix, matrix_inverse;

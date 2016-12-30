@@ -209,4 +209,50 @@ Transform LookAtTransformation(const Vector3f &pos, const Vector3f &target, cons
   return Transform(Inverse(inverse_matrix), inverse_matrix);
 }
 
+template <typename T>
+Point3<T> Transform::operator()(const Point3<T> &p) const {
+  T x = matrix.Get(0, 0) * p.x + matrix.Get(0, 1) * p.y + matrix.Get(0, 2) * p.z + matrix.Get(0, 3);
+  T y = matrix.Get(1, 0) * p.x + matrix.Get(1, 1) * p.y + matrix.Get(1, 2) * p.z + matrix.Get(1, 3);
+  T z = matrix.Get(2, 0) * p.x + matrix.Get(2, 1) * p.y + matrix.Get(2, 2) * p.z + matrix.Get(2, 3);
+  T w = matrix.Get(3, 0) * p.x + matrix.Get(3, 1) * p.y + matrix.Get(3, 2) * p.z + matrix.Get(3, 3);
+  float divisor = 1.0f / w;
+  return w == 1 ? Point3<T>(x, y, z) : Point3<T>(x * divisor, y * divisor, z * divisor);
+}
+
+template <typename T>
+Vector3<T> Transform::operator()(const Vector3<T> &v) const {
+  T x = matrix.Get(0, 0) * v.x + matrix.Get(0, 1) * v.y + matrix.Get(0, 2) * v.z;
+  T y = matrix.Get(1, 0) * v.x + matrix.Get(1, 1) * v.y + matrix.Get(1, 2) * v.z;
+  T z = matrix.Get(2, 0) * v.x + matrix.Get(2, 1) * v.y + matrix.Get(2, 2) * v.z;
+  return Vector3<T>(x, y, z);
+}
+
+template <typename T>
+Normal3<T> Transform::operator()(const Normal3<T> &n) const {
+  T x = matrix_inverse.Get(0, 0) * n.x + matrix_inverse.Get(1, 0) *
+      n.y + matrix_inverse.Get(2, 0) * n.z;
+  T y = matrix_inverse.Get(0, 1) * n.x + matrix_inverse.Get(1, 1) *
+      n.y + matrix_inverse.Get(2, 1) * n.z;
+  T z = matrix_inverse.Get(0, 2) * n.x + matrix_inverse.Get(1, 2) *
+      n.y + matrix_inverse.Get(2, 2) * n.z;
+  return Normal3<T>(x, y, z);
+}
+
+Ray3f Transform::operator()(const Ray3f &r) const {
+  return Ray3f((*this)(r.origin), (*this)(r.direction), r.max_t);
+}
+
+template <typename T>
+AABB3<T> Transform::operator()(const AABB3<T> &b) const {
+  AABB3<T> new_box = AABB3<T>((*this)(b.Corner(0)));
+  for (int i = 1; i < 8; i++) {
+    new_box = Union(new_box, AABB3<T>((*this)(b.Corner(i))));
+  }
+  return new_box;
+}
+
+Transform Transform::operator*(const Transform &that) const {
+  return Transform(matrix * that.matrix, that.matrix_inverse * matrix_inverse);
+}
+
 }
