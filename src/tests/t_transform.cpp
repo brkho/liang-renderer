@@ -1,7 +1,7 @@
 #include "core/transform.h"
 #include "tests/test.h"
 
-void AssertMatEquals(liang::Matrix4x4 matrix, std::vector<float> values) {
+void AssertMatEquals(const liang::Matrix4x4 &matrix, const std::vector<float> &values) {
   for (int i = 0; i < 16; i++) {
     ASSERT_NEAR(values[i], matrix.Get(i / 4, i % 4), 0.00001);
   }

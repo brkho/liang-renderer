@@ -6,6 +6,7 @@
 #ifndef LIANG_CORE_TRANSFORM_H
 #define LIANG_CORE_TRANSFORM_H
 
+#include "core/geometry.h"
 #include "core/liang.h"
 
 namespace liang {
@@ -16,10 +17,10 @@ class Matrix4x4 {
     Matrix4x4();
 
     // Initialize the matrix given a C-style 2D array of 16 floats.
-    Matrix4x4(float m[4][4]);
+    Matrix4x4(const float m[4][4]);
 
     // Initialize the matrix given a C-style 1D array of 16 floats.
-    Matrix4x4(float m[16]);
+    Matrix4x4(const float m[16]);
 
     // Component-wise equality comparison by overloading the appropriate operator.
     bool operator==(const Matrix4x4 &that) const;
@@ -57,6 +58,51 @@ Matrix4x4 Transpose(const Matrix4x4& m);
 // Get the inverse of the matrix. Note: this is slow.
 Matrix4x4 Inverse(const Matrix4x4& m);
 
+// A 3D transformation backed by a Matrix4x4 used to transform points, vecttors, normals, rays, and
+// bounding boxes.
+class Transform {
+  public:
+    // Default constructor initializing the transform to the identity matrix.
+    Transform();
+
+    // Constructor initializing the transform with a single matrix representing the transform. The
+    // inverse is then explicitly computed.
+    Transform(const Matrix4x4& m);
+
+    // Constructor initializing the transform with a matrix and its transform.
+    Transform(const Matrix4x4& m, const Matrix4x4& m_inverse);
+
+    // Returns a transform that is the inverse of the one provided.
+    friend Transform Inverse(const Transform &t);
+
+    // Returns a transform that is the transpose of the one provided.
+    friend Transform Transpose(const Transform &t);
+
+  private:
+    // The matrix backing the transform and its inverse.
+    Matrix4x4 matrix, matrix_inverse;
+};
+
+// Returns a transform that translates in the given direction.
+Transform TranslationTransform(const Vector3f &delta);
+
+// Returns a transform that scales along the x, y, and z axes.
+Transform ScaleTransform(float x, float y, float z);
+
+// Returns a transform that rotates along the x axis.
+Transform RotateXTransform(float theta);
+
+// Returns a transform that rotates along the y axis.
+Transform RotateYTransform(float theta);
+
+// Returns a transform that rotates along the z axis.
+Transform RotateZTransform(float theta);
+
+// Returns a transform that is a rotation along an arbitrary axis.
+Transform RotateArbitraryAxisTransform(const Vector3f &axis, float theta);
+
+// Returns a look at transformation.
+Transform LookAtTransformation(const Vector3f &pos, const Vector3f &target, const Vector3f &up);
 
 }
 

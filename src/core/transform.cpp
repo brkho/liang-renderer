@@ -4,13 +4,13 @@ namespace liang {
 
 Matrix4x4::Matrix4x4() : matrix{1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1} {}
 
-Matrix4x4::Matrix4x4(float m[4][4]) {
+Matrix4x4::Matrix4x4(const float m[4][4]) {
   for (int i = 0; i < 16; i++) {
     matrix[i] = m[i / 4][i % 4];
   }
 }
 
-Matrix4x4::Matrix4x4(float m[16]) {
+Matrix4x4::Matrix4x4(const float m[16]) {
   for (int i = 0; i < 16; i++) {
     matrix[i] = m[i];
   }
@@ -127,6 +127,86 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
     inverse_values[i] *= det;
   }
   return Matrix4x4(inverse_values);
+}
+
+Transform::Transform() : matrix{Matrix4x4()}, matrix_inverse{Matrix4x4()} {}
+
+Transform::Transform(const Matrix4x4& m) : matrix(m), matrix_inverse{Inverse(m)} {}
+
+Transform::Transform(const Matrix4x4& m, const Matrix4x4& m_inverse) : matrix{m},
+    matrix_inverse{m_inverse} {}
+
+Transform Inverse(const Transform &t) {
+  return Transform(t.matrix_inverse, t.matrix);
+}
+
+Transform Transpose(const Transform &t) {
+  return Transform(Transpose(t.matrix), Transpose(t.matrix_inverse));
+}
+
+Transform TranslationTransform(const Vector3f &delta) {
+  float values[16] = {1, 0, 0, delta.x, 0, 1, 0, delta.y, 0, 0, 1, delta.z, 0, 0, 0, 1};
+  float inverse_values[16] = {1, 0, 0, -delta.x, 0, 1, 0, -delta.y, 0, 0, 1, -delta.z, 0, 0, 0, 1};
+  return Transform(Matrix4x4(values), Matrix4x4(inverse_values));
+}
+
+Transform ScaleTransform(float x, float y, float z) {
+  float values[16] = {x, 0, 0, 0, 0, y, 0, 0, 0, 0, z, 0, 0, 0, 0, 1};
+  float inverse_values[16] = {1.0f / x, 0, 0, 0, 0, 1.0f / y, 0, 0, 0, 0, 1.0f / z, 0, 0, 0, 0, 1};
+  return Transform(Matrix4x4(values), Matrix4x4(inverse_values));
+}
+
+Transform RotateXTransform(float theta) {
+  float sin_theta = std::sin(theta);
+  float cos_theta = std::cos(theta);
+  float values[16] = {1, 0, 0, 0, 0, cos_theta, -sin_theta, 0, 0, sin_theta, cos_theta, 0,
+      0, 0, 0, 1};
+  Matrix4x4 matrix = Matrix4x4(values);
+  return Transform(matrix, Transpose(matrix));
+}
+
+Transform RotateYTransform(float theta) {
+  float sin_theta = std::sin(theta);
+  float cos_theta = std::cos(theta);
+  float values[16] = {cos_theta, 0, sin_theta, 0, 0, 1, 0, 0, -sin_theta, 0, cos_theta, 0,
+      0, 0, 0, 1};
+  Matrix4x4 matrix = Matrix4x4(values);
+  return Transform(matrix, Transpose(matrix));
+}
+
+Transform RotateZTransform(float theta) {
+  float sin_theta = std::sin(theta);
+  float cos_theta = std::cos(theta);
+  float values[16] = {cos_theta, -sin_theta, 0, 0, sin_theta, cos_theta, 0, 0, 0, 0, 1, 0,
+      0, 0, 0, 1};
+  Matrix4x4 matrix = Matrix4x4(values);
+  return Transform(matrix, Transpose(matrix));
+}
+
+// Fancy vector algebra lifted from pbrt.
+Transform RotateArbitraryAxisTransform(const Vector3f &axis, float theta) {
+  Vector3f a = Normalize(axis);
+  float sin_theta = std::sin(theta);
+  float cos_theta = std::cos(theta);
+  float values[16] = {a.x * a.x + (1 - a.x * a.x) * cos_theta,
+      a.x * a.y * (1 - cos_theta) - a.z * sin_theta, a.x * a.z * (1 - cos_theta) + a.y * sin_theta,
+      0, a.x * a.y * (1 - cos_theta) + a.z * sin_theta, a.y * a.y + (1 - a.y * a.y) * cos_theta,
+      a.y * a.z * (1 - cos_theta) - a.x * sin_theta, 0,
+      a.x * a.z * (1 - cos_theta) - a.y * sin_theta, a.y * a.z * (1 - cos_theta) + a.x * sin_theta,
+      a.z * a.z + (1 - a.z * a.z) * cos_theta, 0, 0, 0, 0, 1};
+  Matrix4x4 matrix = Matrix4x4(values);
+  return Transform(matrix, Transpose(matrix));
+}
+
+// Returns a look at transformation, also adapted from pbrt.
+Transform LookAtTransformation(const Vector3f &pos, const Vector3f &target, const Vector3f &up) {
+  Vector3f direction = Normalize(target - pos);
+  Vector3f left = Normalize(Cross(Normalize(up), direction));
+  Vector3f new_up = Cross(direction, left);
+  float inverse_values[16] = {left.x, new_up.x, direction.x, pos.x, left.y, new_up.y, direction.y,
+      pos.y, left.z, new_up.z, direction.z, pos.z, 0, 0, 0, 1};
+  Matrix4x4 inverse_matrix = Matrix4x4(inverse_values);
+  return Transform(Inverse(inverse_matrix), inverse_matrix);
 }
 
 }

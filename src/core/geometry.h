@@ -105,6 +105,7 @@ class Vector2 {
     std::string ToString() const {
       return "(" + std::to_string(x) + ", " + std::to_string(y) + ")";
     }
+
   private:
     // Returns whether the vector is valid. This returns true if there are no NaNs, else false.
     bool IsValid() const {
@@ -233,6 +234,7 @@ class Vector3 {
     std::string ToString() const {
       return "(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")";
     }
+
   private:
     // Returns whether the vector is valid. This returns true if there are no NaNs, else false.
     bool IsValid() const {
@@ -351,6 +353,7 @@ class Point2 {
     std::string ToString() const {
       return "(" + std::to_string(x) + ", " + std::to_string(y) + ")";
     }
+
   private:
     // Returns whether the Point2 is valid. This returns true if there are no NaNs, else false.
     bool IsValid() const {
@@ -449,6 +452,7 @@ class Point3 {
     std::string ToString() const {
       return "(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")";
     }
+
   private:
     // Returns whether the Point3 is valid. This returns true if there are no NaNs, else false.
     bool IsValid() const {
