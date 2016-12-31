@@ -18,7 +18,8 @@ Matrix4x4::Matrix4x4(const float m[16]) {
 
 bool Matrix4x4::operator==(const Matrix4x4 &that) const {
   for (int i = 0; i < 16; i++) {
-    if (matrix[i] != that.matrix[i]) {
+    // TODO(brianh): Let's try to make this more exact...
+    if (std::abs(matrix[i] - that.matrix[i]) > 0.000001) {
       return false;
     }
   }
@@ -75,50 +76,66 @@ std::string Matrix4x4::ToString() const {
       std::to_string(matrix[14]) + ",\t" + std::to_string(matrix[15]) + " }";
 }
 
-Matrix4x4 Transpose(const Matrix4x4& m) {
-  float transposed_values[16] = {m.Get(0, 0), m.Get(1, 0), m.Get(2, 0), m.Get(3, 0), m.Get(0, 1),
-      m.Get(1, 1), m.Get(2, 1), m.Get(3, 1), m.Get(0, 2), m.Get(1, 2), m.Get(2, 2), m.Get(3, 2),
-      m.Get(0, 3), m.Get(1, 3), m.Get(2, 3), m.Get(3, 3)};
+Matrix4x4 Matrix4x4::Transpose() const {
+  float transposed_values[16] = {Get(0, 0), Get(1, 0), Get(2, 0), Get(3, 0), Get(0, 1),
+      Get(1, 1), Get(2, 1), Get(3, 1), Get(0, 2), Get(1, 2), Get(2, 2), Get(3, 2),
+      Get(0, 3), Get(1, 3), Get(2, 3), Get(3, 3)};
   return Matrix4x4(transposed_values);
 }
 
 // Adapted from GLU's MESA implementation.
-Matrix4x4 Inverse(const Matrix4x4& m) {
+Matrix4x4 Matrix4x4::Inverse() const {
   float inverse_values[16];
-  inverse_values[0] = m[5] * m[10] * m[15] - m[5] * m[11] * m[14] - m[9] * m[6] * m[15] + m[9] *
-      m[7] * m[14] + m[13] * m[6] * m[11] - m[13] * m[7] * m[10];
-  inverse_values[4] = -m[4] * m[10] * m[15] + m[4] * m[11] * m[14] + m[8] * m[6] * m[15] - m[8] *
-      m[7] * m[14] - m[12] * m[6] * m[11] + m[12] * m[7] * m[10];
-  inverse_values[8] = m[4] * m[9] * m[15] - m[4] * m[11] * m[13] - m[8] * m[5] * m[15] + m[8] *
-      m[7] * m[13] + m[12] * m[5] * m[11] - m[12] * m[7] * m[9];
-  inverse_values[12] = -m[4] * m[9] * m[14] + m[4] * m[10] * m[13] + m[8] * m[5] * m[14] - m[8] *
-      m[6] * m[13] - m[12] * m[5] * m[10] + m[12] * m[6] * m[9];
-  inverse_values[1] = -m[1] * m[10] * m[15] + m[1] * m[11] * m[14] + m[9] * m[2] * m[15] - m[9] *
-      m[3] * m[14] - m[13] * m[2] * m[11] + m[13] * m[3] * m[10];
-  inverse_values[5] = m[0] * m[10] * m[15] - m[0] * m[11] * m[14] - m[8] * m[2] * m[15] + m[8] *
-      m[3] * m[14] + m[12] * m[2] * m[11] - m[12] * m[3] * m[10];
-  inverse_values[9] = -m[0] * m[9] * m[15] + m[0] * m[11] * m[13] + m[8] * m[1] * m[15] - m[8] *
-      m[3] * m[13] - m[12] * m[1] * m[11] + m[12] * m[3] * m[9];
-  inverse_values[13] = m[0] * m[9] * m[14] - m[0] * m[10] * m[13] - m[8] * m[1] * m[14] + m[8] *
-      m[2] * m[13] + m[12] * m[1] * m[10] - m[12] * m[2] * m[9];
-  inverse_values[2] = m[1] * m[6] * m[15] - m[1] * m[7] * m[14] - m[5] * m[2] * m[15] + m[5] *
-      m[3] * m[14] + m[13] * m[2] * m[7] - m[13] * m[3] * m[6];
-  inverse_values[6] = -m[0] * m[6] * m[15] + m[0] * m[7] * m[14] + m[4] * m[2] * m[15] - m[4] *
-      m[3] * m[14] - m[12] * m[2] * m[7] + m[12] * m[3] * m[6];
-  inverse_values[10] = m[0] * m[5] * m[15] - m[0] * m[7] * m[13] - m[4] * m[1] * m[15] + m[4] *
-      m[3] * m[13] + m[12] * m[1] * m[7] - m[12] * m[3] * m[5];
-  inverse_values[14] = -m[0] * m[5] * m[14] + m[0] * m[6] * m[13] + m[4] * m[1] * m[14] - m[4] *
-      m[2] * m[13] - m[12] * m[1] * m[6] + m[12] * m[2] * m[5];
-  inverse_values[3] = -m[1] * m[6] * m[11] + m[1] * m[7] * m[10] + m[5] * m[2] * m[11] - m[5] *
-      m[3] * m[10] - m[9] * m[2] * m[7] + m[9] * m[3] * m[6];
-  inverse_values[7] = m[0] * m[6] * m[11] - m[0] * m[7] * m[10] - m[4] * m[2] * m[11] + m[4] *
-      m[3] * m[10] + m[8] * m[2] * m[7] - m[8] * m[3] * m[6];
-  inverse_values[11] = -m[0] * m[5] * m[11] + m[0] * m[7] * m[9] + m[4] * m[1] * m[11] - m[4] *
-      m[3] * m[9] - m[8] * m[1] * m[7] + m[8] * m[3] * m[5];
-  inverse_values[15] = m[0] * m[5] * m[10] - m[0] * m[6] * m[9] - m[4] * m[1] * m[10] + m[4] *
-      m[2] * m[9] + m[8] * m[1] * m[6] - m[8] * m[2] * m[5];
-  float det = m[0] * inverse_values[0] + m[1] * inverse_values[4] + m[2] * inverse_values[8] +
-      m[3] * inverse_values[12];
+  inverse_values[0] = matrix[5] * matrix[10] * matrix[15] - matrix[5] * matrix[11] * matrix[14] -
+      matrix[9] * matrix[6] * matrix[15] + matrix[9] * matrix[7] * matrix[14] + matrix[13] *
+      matrix[6] * matrix[11] - matrix[13] * matrix[7] * matrix[10];
+  inverse_values[4] = -matrix[4] * matrix[10] * matrix[15] + matrix[4] * matrix[11] * matrix[14] +
+      matrix[8] * matrix[6] * matrix[15] - matrix[8] * matrix[7] * matrix[14] - matrix[12] *
+      matrix[6] * matrix[11] + matrix[12] * matrix[7] * matrix[10];
+  inverse_values[8] = matrix[4] * matrix[9] * matrix[15] - matrix[4] * matrix[11] * matrix[13] -
+      matrix[8] * matrix[5] * matrix[15] + matrix[8] * matrix[7] * matrix[13] + matrix[12] *
+      matrix[5] * matrix[11] - matrix[12] * matrix[7] * matrix[9];
+  inverse_values[12] = -matrix[4] * matrix[9] * matrix[14] + matrix[4] * matrix[10] * matrix[13] +
+      matrix[8] * matrix[5] * matrix[14] - matrix[8] * matrix[6] * matrix[13] - matrix[12] *
+      matrix[5] * matrix[10] + matrix[12] * matrix[6] * matrix[9];
+  inverse_values[1] = -matrix[1] * matrix[10] * matrix[15] + matrix[1] * matrix[11] * matrix[14] +
+      matrix[9] * matrix[2] * matrix[15] - matrix[9] * matrix[3] * matrix[14] - matrix[13] *
+      matrix[2] * matrix[11] + matrix[13] * matrix[3] * matrix[10];
+  inverse_values[5] = matrix[0] * matrix[10] * matrix[15] - matrix[0] * matrix[11] * matrix[14] -
+      matrix[8] * matrix[2] * matrix[15] + matrix[8] * matrix[3] * matrix[14] + matrix[12] *
+      matrix[2] * matrix[11] - matrix[12] * matrix[3] * matrix[10];
+  inverse_values[9] = -matrix[0] * matrix[9] * matrix[15] + matrix[0] * matrix[11] * matrix[13] +
+      matrix[8] * matrix[1] * matrix[15] - matrix[8] * matrix[3] * matrix[13] - matrix[12] *
+      matrix[1] * matrix[11] + matrix[12] * matrix[3] * matrix[9];
+  inverse_values[13] = matrix[0] * matrix[9] * matrix[14] - matrix[0] * matrix[10] * matrix[13] -
+      matrix[8] * matrix[1] * matrix[14] + matrix[8] * matrix[2] * matrix[13] + matrix[12] *
+      matrix[1] * matrix[10] - matrix[12] * matrix[2] * matrix[9];
+  inverse_values[2] = matrix[1] * matrix[6] * matrix[15] - matrix[1] * matrix[7] * matrix[14] -
+      matrix[5] * matrix[2] * matrix[15] + matrix[5] * matrix[3] * matrix[14] + matrix[13] *
+      matrix[2] * matrix[7] - matrix[13] * matrix[3] * matrix[6];
+  inverse_values[6] = -matrix[0] * matrix[6] * matrix[15] + matrix[0] * matrix[7] * matrix[14] +
+      matrix[4] * matrix[2] * matrix[15] - matrix[4] * matrix[3] * matrix[14] - matrix[12] *
+      matrix[2] * matrix[7] + matrix[12] * matrix[3] * matrix[6];
+  inverse_values[10] = matrix[0] * matrix[5] * matrix[15] - matrix[0] * matrix[7] * matrix[13] -
+      matrix[4] * matrix[1] * matrix[15] + matrix[4] * matrix[3] * matrix[13] + matrix[12] *
+      matrix[1] * matrix[7] - matrix[12] * matrix[3] * matrix[5];
+  inverse_values[14] = -matrix[0] * matrix[5] * matrix[14] + matrix[0] * matrix[6] * matrix[13] +
+      matrix[4] * matrix[1] * matrix[14] - matrix[4] * matrix[2] * matrix[13] - matrix[12] *
+      matrix[1] * matrix[6] + matrix[12] * matrix[2] * matrix[5];
+  inverse_values[3] = -matrix[1] * matrix[6] * matrix[11] + matrix[1] * matrix[7] * matrix[10] +
+      matrix[5] * matrix[2] * matrix[11] - matrix[5] * matrix[3] * matrix[10] - matrix[9] *
+      matrix[2] * matrix[7] + matrix[9] * matrix[3] * matrix[6];
+  inverse_values[7] = matrix[0] * matrix[6] * matrix[11] - matrix[0] * matrix[7] * matrix[10] -
+      matrix[4] * matrix[2] * matrix[11] + matrix[4] * matrix[3] * matrix[10] + matrix[8] *
+      matrix[2] * matrix[7] - matrix[8] * matrix[3] * matrix[6];
+  inverse_values[11] = -matrix[0] * matrix[5] * matrix[11] + matrix[0] * matrix[7] * matrix[9] +
+      matrix[4] * matrix[1] * matrix[11] - matrix[4] * matrix[3] * matrix[9] - matrix[8] *
+      matrix[1] * matrix[7] + matrix[8] * matrix[3] * matrix[5];
+  inverse_values[15] = matrix[0] * matrix[5] * matrix[10] - matrix[0] * matrix[6] * matrix[9] -
+      matrix[4] * matrix[1] * matrix[10] + matrix[4] * matrix[2] * matrix[9] + matrix[8] *
+      matrix[1] * matrix[6] - matrix[8] * matrix[2] * matrix[5];
+  float det = matrix[0] * inverse_values[0] + matrix[1] * inverse_values[4] + matrix[2] *
+      inverse_values[8] + matrix[3] * inverse_values[12];
   // TODO(brkho): Use a more numerically stable method here.
   assert(std::abs(det) > 0.000001);
 
@@ -131,17 +148,21 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 
 Transform::Transform() : matrix{Matrix4x4()}, matrix_inverse{Matrix4x4()} {}
 
-Transform::Transform(const Matrix4x4& m) : matrix(m), matrix_inverse{Inverse(m)} {}
+Transform::Transform(const Matrix4x4& m) : matrix(m), matrix_inverse{m.Inverse()} {}
 
 Transform::Transform(const Matrix4x4& m, const Matrix4x4& m_inverse) : matrix{m},
     matrix_inverse{m_inverse} {}
 
-Transform Inverse(const Transform &t) {
-  return Transform(t.matrix_inverse, t.matrix);
+Transform Transform::Inverse() const {
+  return Transform(matrix_inverse, matrix);
 }
 
-Transform Transpose(const Transform &t) {
-  return Transform(Transpose(t.matrix), Transpose(t.matrix_inverse));
+Transform Transform::Transpose() const {
+  return Transform(matrix.Transpose(), matrix_inverse.Transpose());
+}
+
+bool Transform::operator==(const Transform &that) const {
+  return matrix == that.matrix && matrix_inverse == that.matrix_inverse;
 }
 
 Transform TranslationTransform(const Vector3f &delta) {
@@ -162,7 +183,7 @@ Transform RotateXTransform(float theta) {
   float values[16] = {1, 0, 0, 0, 0, cos_theta, -sin_theta, 0, 0, sin_theta, cos_theta, 0,
       0, 0, 0, 1};
   Matrix4x4 matrix = Matrix4x4(values);
-  return Transform(matrix, Transpose(matrix));
+  return Transform(matrix, matrix.Transpose());
 }
 
 Transform RotateYTransform(float theta) {
@@ -171,7 +192,7 @@ Transform RotateYTransform(float theta) {
   float values[16] = {cos_theta, 0, sin_theta, 0, 0, 1, 0, 0, -sin_theta, 0, cos_theta, 0,
       0, 0, 0, 1};
   Matrix4x4 matrix = Matrix4x4(values);
-  return Transform(matrix, Transpose(matrix));
+  return Transform(matrix, matrix.Transpose());
 }
 
 Transform RotateZTransform(float theta) {
@@ -180,7 +201,7 @@ Transform RotateZTransform(float theta) {
   float values[16] = {cos_theta, -sin_theta, 0, 0, sin_theta, cos_theta, 0, 0, 0, 0, 1, 0,
       0, 0, 0, 1};
   Matrix4x4 matrix = Matrix4x4(values);
-  return Transform(matrix, Transpose(matrix));
+  return Transform(matrix, matrix.Transpose());
 }
 
 // Fancy vector algebra lifted from pbrt.
@@ -195,7 +216,7 @@ Transform RotateArbitraryAxisTransform(const Vector3f &axis, float theta) {
       a.x * a.z * (1 - cos_theta) - a.y * sin_theta, a.y * a.z * (1 - cos_theta) + a.x * sin_theta,
       a.z * a.z + (1 - a.z * a.z) * cos_theta, 0, 0, 0, 0, 1};
   Matrix4x4 matrix = Matrix4x4(values);
-  return Transform(matrix, Transpose(matrix));
+  return Transform(matrix, matrix.Transpose());
 }
 
 // Returns a look at transformation, also adapted from pbrt.
@@ -206,7 +227,7 @@ Transform LookAtTransformation(const Vector3f &pos, const Vector3f &target, cons
   float inverse_values[16] = {left.x, new_up.x, direction.x, pos.x, left.y, new_up.y, direction.y,
       pos.y, left.z, new_up.z, direction.z, pos.z, 0, 0, 0, 1};
   Matrix4x4 inverse_matrix = Matrix4x4(inverse_values);
-  return Transform(Inverse(inverse_matrix), inverse_matrix);
+  return Transform(inverse_matrix.Inverse(), inverse_matrix);
 }
 
 template <typename T>
@@ -227,32 +248,17 @@ Vector3<T> Transform::operator()(const Vector3<T> &v) const {
   return Vector3<T>(x, y, z);
 }
 
-template <typename T>
-Normal3<T> Transform::operator()(const Normal3<T> &n) const {
-  T x = matrix_inverse.Get(0, 0) * n.x + matrix_inverse.Get(1, 0) *
-      n.y + matrix_inverse.Get(2, 0) * n.z;
-  T y = matrix_inverse.Get(0, 1) * n.x + matrix_inverse.Get(1, 1) *
-      n.y + matrix_inverse.Get(2, 1) * n.z;
-  T z = matrix_inverse.Get(0, 2) * n.x + matrix_inverse.Get(1, 2) *
-      n.y + matrix_inverse.Get(2, 2) * n.z;
-  return Normal3<T>(x, y, z);
-}
 
 Ray3f Transform::operator()(const Ray3f &r) const {
   return Ray3f((*this)(r.origin), (*this)(r.direction), r.max_t);
 }
 
-template <typename T>
-AABB3<T> Transform::operator()(const AABB3<T> &b) const {
-  AABB3<T> new_box = AABB3<T>((*this)(b.Corner(0)));
-  for (int i = 1; i < 8; i++) {
-    new_box = Union(new_box, AABB3<T>((*this)(b.Corner(i))));
-  }
-  return new_box;
-}
-
 Transform Transform::operator*(const Transform &that) const {
   return Transform(matrix * that.matrix, that.matrix_inverse * matrix_inverse);
+}
+
+std::string Transform::ToString() const {
+  return "{\n" + matrix.ToString() + ",\n" + matrix_inverse.ToString() + "\n}";
 }
 
 }

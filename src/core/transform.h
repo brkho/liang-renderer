@@ -43,6 +43,12 @@ class Matrix4x4 {
     // Sets the element at the ith row and jth column.
     void Set(uint i, uint j, float value);
 
+    // Return a new matrix that is the transpose of the current one.
+    Matrix4x4 Transpose() const;
+
+    // Return a new matrix that is the inverse of the current one.
+    Matrix4x4 Inverse() const;
+
     // Pretty prints a Matrix4x4.
     std::string ToString() const;
 
@@ -51,12 +57,6 @@ class Matrix4x4 {
     // methods to eliminate indexing errors.
     float matrix[16];
 };
-
-// Given a matrix, output its transpose.
-Matrix4x4 Transpose(const Matrix4x4& m);
-
-// Get the inverse of the matrix. Note: this is slow.
-Matrix4x4 Inverse(const Matrix4x4& m);
 
 // A 3D transformation backed by a Matrix4x4 used to transform points, vecttors, normals, rays, and
 // bounding boxes.
@@ -72,11 +72,14 @@ class Transform {
     // Constructor initializing the transform with a matrix and its transform.
     Transform(const Matrix4x4& m, const Matrix4x4& m_inverse);
 
-    // Returns a transform that is the inverse of the one provided.
-    friend Transform Inverse(const Transform &t);
+    // Returns a transform that is the inverse of the current one.
+    Transform Inverse() const;
 
-    // Returns a transform that is the transpose of the one provided.
-    friend Transform Transpose(const Transform &t);
+    // Returns a transform that is the transpose of the current one.
+    Transform Transpose() const;
+
+    // Tests if two transforms are equal by comparing their matrices.
+    bool operator==(const Transform &that) const;
 
     // Transforms a point by multiplying the point with the matrix.
     template <typename T>
@@ -90,7 +93,17 @@ class Transform {
     // Transforms a normal by multiplying with the transpose of the inverse of the matrix. Normals
     // are a special case of vectors, so they are likewise not affected by translation.
     template <typename T>
-    Normal3<T> operator()(const Normal3<T> &n) const;
+    Normal3<T> operator()(const Normal3<T> &n) const {
+      // TODO(brkho): I have no idea why this needs to be inline, but I get a linker error if it
+      // isn't. I should investigate here. Maybe I need to make geometry not header-only.
+      T x = matrix_inverse.Get(0, 0) * n.x + matrix_inverse.Get(1, 0) *
+          n.y + matrix_inverse.Get(2, 0) * n.z;
+      T y = matrix_inverse.Get(0, 1) * n.x + matrix_inverse.Get(1, 1) *
+          n.y + matrix_inverse.Get(2, 1) * n.z;
+      T z = matrix_inverse.Get(0, 2) * n.x + matrix_inverse.Get(1, 2) *
+          n.y + matrix_inverse.Get(2, 2) * n.z;
+      return Normal3<T>(x, y, z);
+    }
 
     // Transforms a ray by transforming its origin and direction.
     Ray3f operator()(const Ray3f &r) const;
@@ -98,10 +111,19 @@ class Transform {
     // Transforms a bounding box by transforming each one of its corners and computing a new
     // bounding box that encompasses the resulting points.
     template <typename T>
-    AABB3<T> operator()(const AABB3<T> &b) const;
+    AABB3<T> operator()(const AABB3<T> &b) const {
+      AABB3<T> new_box = AABB3<T>((*this)(b.Corner(0)));
+      for (int i = 1; i < 8; i++) {
+        new_box = Union(new_box, AABB3<T>((*this)(b.Corner(i))));
+      }
+      return new_box;
+    }
 
     // Multiply two Transforms together (aka multiplying their matrices) to compose them.
     Transform operator*(const Transform &that) const;
+
+    // Pretty prints a Transform.
+    std::string ToString() const;
 
   private:
     // The matrix backing the transform and its inverse.

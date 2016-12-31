@@ -1,27 +1,5 @@
-#include "core/geometry.h"
 #include "tests/test.h"
-
-void Vector2IntEquals(liang::Vector2i vec, int x, int y) {
-  ASSERT_EQ(vec.x, x);
-  ASSERT_EQ(vec.y, y);
-}
-
-void Vector2FloatEquals(liang::Vector2f vec, float x, float y) {
-  ASSERT_FLOAT_EQ(vec.x, x);
-  ASSERT_FLOAT_EQ(vec.y, y);
-}
-
-void Vector3IntEquals(liang::Vector3i vec, int x, int y, int z) {
-  ASSERT_EQ(vec.x, x);
-  ASSERT_EQ(vec.y, y);
-  ASSERT_EQ(vec.z, z);
-}
-
-void Vector3FloatEquals(liang::Vector3f vec, float x, float y, float z) {
-  ASSERT_FLOAT_EQ(vec.x, x);
-  ASSERT_FLOAT_EQ(vec.y, y);
-  ASSERT_FLOAT_EQ(vec.z, z);
-}
+#include "tests/util.h"
 
 TEST(GeometryTest, Vector2Creation) {
   liang::Vector2i default_int_vector = liang::Vector2i();
@@ -45,10 +23,10 @@ TEST(GeometryTest, Vector2Indexing) {
 
 TEST(GeometryTest, Vector2IndexingOutOfRange) {
   liang::Vector2i vec = liang::Vector2i(1, 2);
-  ASSERT_DEATH(vec[2], liang::ASSERTION_FAILURE);
-  ASSERT_DEATH(vec[-1], liang::ASSERTION_FAILURE);
-  ASSERT_DEATH({ vec[2] = 5; }, liang::ASSERTION_FAILURE);
-  ASSERT_DEATH({ vec[-1] = 5; }, liang::ASSERTION_FAILURE);
+  ASSERT_DEATH(vec[2], ASSERTION_FAILURE);
+  ASSERT_DEATH(vec[-1], ASSERTION_FAILURE);
+  ASSERT_DEATH({ vec[2] = 5; }, ASSERTION_FAILURE);
+  ASSERT_DEATH({ vec[-1] = 5; }, ASSERTION_FAILURE);
 }
 
 TEST(GeometryTest, Vector2Addition) {
@@ -99,8 +77,8 @@ TEST(GeometryTest, Vector2Division) {
 
 TEST(GeometryTest, Vector2DivisonByZero) {
   liang::Vector2f vec = liang::Vector2f(1.0, 2.0);
-  ASSERT_DEATH(vec / 0.0, liang::ASSERTION_FAILURE);
-  ASSERT_DEATH({ vec /= 0.0; }, liang::ASSERTION_FAILURE);
+  ASSERT_DEATH(vec / 0.0, ASSERTION_FAILURE);
+  ASSERT_DEATH({ vec /= 0.0; }, ASSERTION_FAILURE);
 }
 
 TEST(GeometryTest, Vector2Abs) {
@@ -157,10 +135,10 @@ TEST(GeometryTest, Vector3Indexing) {
 
 TEST(GeometryTest, Vector3IndexingOutOfRange) {
   liang::Vector3i vec = liang::Vector3i(1, 2, 3);
-  ASSERT_DEATH(vec[3], liang::ASSERTION_FAILURE);
-  ASSERT_DEATH(vec[-1], liang::ASSERTION_FAILURE);
-  ASSERT_DEATH({ vec[3] = 5; }, liang::ASSERTION_FAILURE);
-  ASSERT_DEATH({ vec[-1] = 5; }, liang::ASSERTION_FAILURE);
+  ASSERT_DEATH(vec[3], ASSERTION_FAILURE);
+  ASSERT_DEATH(vec[-1], ASSERTION_FAILURE);
+  ASSERT_DEATH({ vec[3] = 5; }, ASSERTION_FAILURE);
+  ASSERT_DEATH({ vec[-1] = 5; }, ASSERTION_FAILURE);
 }
 
 TEST(GeometryTest, Vector3Addition) {
@@ -211,8 +189,8 @@ TEST(GeometryTest, Vector3Division) {
 
 TEST(GeometryTest, Vector3DivisonByZero) {
   liang::Vector3f vec = liang::Vector3f(1.0, 2.0, 3.0);
-  ASSERT_DEATH(vec / 0.0, liang::ASSERTION_FAILURE);
-  ASSERT_DEATH({ vec /= 0.0; }, liang::ASSERTION_FAILURE);
+  ASSERT_DEATH(vec / 0.0, ASSERTION_FAILURE);
+  ASSERT_DEATH({ vec /= 0.0; }, ASSERTION_FAILURE);
 }
 
 TEST(GeometryTest, Vector3Abs) {
@@ -264,28 +242,6 @@ TEST(GeometryTest, Vector3CreateCoordSystem) {
   Vector3FloatEquals(vec3, -0.8, 0.6, 0.0);
 }
 
-void Point2IntEquals(liang::Point2i point, int x, int y) {
-  ASSERT_EQ(point.x, x);
-  ASSERT_EQ(point.y, y);
-}
-
-void Point2FloatEquals(liang::Point2f point, float x, float y) {
-  ASSERT_FLOAT_EQ(point.x, x);
-  ASSERT_FLOAT_EQ(point.y, y);
-}
-
-void Point3IntEquals(liang::Point3i point, int x, int y, int z) {
-  ASSERT_EQ(point.x, x);
-  ASSERT_EQ(point.y, y);
-  ASSERT_EQ(point.z, z);
-}
-
-void Point3FloatEquals(liang::Point3f point, float x, float y, float z) {
-  ASSERT_FLOAT_EQ(point.x, x);
-  ASSERT_FLOAT_EQ(point.y, y);
-  ASSERT_FLOAT_EQ(point.z, z);
-}
-
 TEST(GeometryTest, Point2Creation) {
   liang::Point2i default_int_point = liang::Point2i();
   Point2IntEquals(default_int_point, 0, 0);
@@ -308,10 +264,10 @@ TEST(GeometryTest, Point2Indexing) {
 
 TEST(GeometryTest, Point2IndexingOutOfBounds) {
   liang::Point2i vec = liang::Point2i(1, 2);
-  ASSERT_DEATH(vec[-1], liang::ASSERTION_FAILURE);
-  ASSERT_DEATH(vec[2], liang::ASSERTION_FAILURE);
-  ASSERT_DEATH({ vec[-1] = 5; }, liang::ASSERTION_FAILURE);
-  ASSERT_DEATH({ vec[2] = 5; }, liang::ASSERTION_FAILURE);
+  ASSERT_DEATH(vec[-1], ASSERTION_FAILURE);
+  ASSERT_DEATH(vec[2], ASSERTION_FAILURE);
+  ASSERT_DEATH({ vec[-1] = 5; }, ASSERTION_FAILURE);
+  ASSERT_DEATH({ vec[2] = 5; }, ASSERTION_FAILURE);
 }
 
 TEST(GeometryTest, Point2Addition) {
@@ -364,8 +320,8 @@ TEST(GeometryTest, Point2Lerp) {
 TEST(GeometryTest, Point2LerpOutOfBounds) {
   liang::Point2f p1 = liang::Point2f(1.0, 2.0);
   liang::Point2f p2 = liang::Point2f(2.0, 3.0);
-  ASSERT_DEATH(liang::Lerp(p1, p2, -0.5), liang::ASSERTION_FAILURE);
-  ASSERT_DEATH(liang::Lerp(p1, p2, 1.1), liang::ASSERTION_FAILURE);
+  ASSERT_DEATH(liang::Lerp(p1, p2, -0.5), ASSERTION_FAILURE);
+  ASSERT_DEATH(liang::Lerp(p1, p2, 1.1), ASSERTION_FAILURE);
 }
 
 TEST(GeometryTest, Point3Creation) {
@@ -391,10 +347,10 @@ TEST(GeometryTest, Point3Indexing) {
 
 TEST(GeometryTest, Point3IndexingOutOfBounds) {
   liang::Point3i vec = liang::Point3i(1, 2, 3);
-  ASSERT_DEATH(vec[-1], liang::ASSERTION_FAILURE);
-  ASSERT_DEATH(vec[3], liang::ASSERTION_FAILURE);
-  ASSERT_DEATH({ vec[-1] = 5; }, liang::ASSERTION_FAILURE);
-  ASSERT_DEATH({ vec[3] = 5; }, liang::ASSERTION_FAILURE);
+  ASSERT_DEATH(vec[-1], ASSERTION_FAILURE);
+  ASSERT_DEATH(vec[3], ASSERTION_FAILURE);
+  ASSERT_DEATH({ vec[-1] = 5; }, ASSERTION_FAILURE);
+  ASSERT_DEATH({ vec[3] = 5; }, ASSERTION_FAILURE);
 }
 
 
@@ -448,14 +404,8 @@ TEST(GeometryTest, Point3Lerp) {
 TEST(GeometryTest, Point3LerpOutOfBounds) {
   liang::Point3f p1 = liang::Point3f(1.0, 2.0, 3.0);
   liang::Point3f p2 = liang::Point3f(2.0, 3.0, 4.0);
-  ASSERT_DEATH(liang::Lerp(p1, p2, -0.5), liang::ASSERTION_FAILURE);
-  ASSERT_DEATH(liang::Lerp(p1, p2, 1.1), liang::ASSERTION_FAILURE);
-}
-
-void Normal3FloatEquals(liang::Normal3f normal, float x, float y, float z) {
-  ASSERT_FLOAT_EQ(normal.x, x);
-  ASSERT_FLOAT_EQ(normal.y, y);
-  ASSERT_FLOAT_EQ(normal.z, z);
+  ASSERT_DEATH(liang::Lerp(p1, p2, -0.5), ASSERTION_FAILURE);
+  ASSERT_DEATH(liang::Lerp(p1, p2, 1.1), ASSERTION_FAILURE);
 }
 
 TEST(GeometryTest, Normal3Creation) {
@@ -493,18 +443,8 @@ TEST(GeometryTest, Ray3fParameterizationOutOfBounds) {
   liang::Point3f origin = liang::Point3f(1.0, 2.0, 3.0);
   liang::Vector3f direction = liang::Vector3f(0.1, 0.2, 0.3);
   liang::Ray3f ray = liang::Ray3f(origin, direction, 5.0);
-  ASSERT_DEATH(ray(-1.0), liang::ASSERTION_FAILURE);
-  ASSERT_DEATH(liang::Ray3f(origin, direction, -5.0), liang::ASSERTION_FAILURE);
-}
-
-void AABB3FloatEquals(liang::AABB3f box, float min_x, float min_y, float min_z, float max_x,
-    float max_y, float max_z) {
-  ASSERT_FLOAT_EQ(min_x, box.min_point.x);
-  ASSERT_FLOAT_EQ(min_y, box.min_point.y);
-  ASSERT_FLOAT_EQ(min_z, box.min_point.z);
-  ASSERT_FLOAT_EQ(max_x, box.max_point.x);
-  ASSERT_FLOAT_EQ(max_y, box.max_point.y);
-  ASSERT_FLOAT_EQ(max_z, box.max_point.z);
+  ASSERT_DEATH(ray(-1.0), ASSERTION_FAILURE);
+  ASSERT_DEATH(liang::Ray3f(origin, direction, -5.0), ASSERTION_FAILURE);
 }
 
 TEST(GeometryTest, AABB3Creation) {
@@ -532,7 +472,7 @@ TEST(GeometryTest, AABB3Corner) {
 
 TEST(GeometryTest, AABB3CornerOutOfBounds) {
   liang::AABB3f box = liang::AABB3f(liang::Point3f(1.0, 2.0, 1.0), liang::Point3f(2.0, 1.0, 2.0));
-  ASSERT_DEATH(box.Corner(8), liang::ASSERTION_FAILURE);
+  ASSERT_DEATH(box.Corner(8), ASSERTION_FAILURE);
 }
 
 TEST(GeometryTest, AABB3IsEmpty) {

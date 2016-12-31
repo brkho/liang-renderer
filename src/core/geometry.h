@@ -516,8 +516,8 @@ class Ray3f {
     }
 
     // Construct a ray given an origin and a direction, initialing max t to infinity.
-    Ray3f(Point3f origin, Vector3f direction) : Ray3f(origin, direction,
-        std::numeric_limits<float>::infinity()) {}
+    Ray3f(Point3f origin, Vector3f direction) : Ray3f(origin,
+        direction, std::numeric_limits<float>::infinity()) {}
 
     // Parameterized by t, return the point that the ray represents.
     Point3f operator()(float t) const {
