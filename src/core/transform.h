@@ -78,6 +78,9 @@ class Transform {
     // Returns a transform that is the transpose of the current one.
     Transform Transpose() const;
 
+    // Returns whether the transform swaps the handedness of the coordinate space.
+    bool SwapsHandedness() const;
+
     // Tests if two transforms are equal by comparing their matrices.
     bool operator==(const Transform &that) const;
 

@@ -161,6 +161,15 @@ Transform Transform::Transpose() const {
   return Transform(matrix.Transpose(), matrix_inverse.Transpose());
 }
 
+// TODO(brianh): Needs test.
+bool Transform::SwapsHandedness() const {
+  float det = matrix.Get(0, 0) * (matrix.Get(1, 1) * matrix.Get(2, 2) - matrix.Get(1, 2) *
+      matrix.Get(2, 1)) - matrix.Get(0, 1) * (matrix.Get(1, 0) * matrix.Get(2, 2) -
+      matrix.Get(1, 2) * matrix.Get(2, 0)) + matrix.Get(0, 2) * (matrix.Get(1, 0) *
+      matrix.Get(2, 1) - matrix.Get(1, 1) * matrix.Get(2, 0));
+  return det < 0;
+}
+
 bool Transform::operator==(const Transform &that) const {
   return matrix == that.matrix && matrix_inverse == that.matrix_inverse;
 }
