@@ -14,8 +14,8 @@ namespace liang {
 
 class Shape {
   public:
-    // Shape constructor that takes the transform from world space to object space and vice versa.
-    Shape(const Transform *object_to_world, const Transform *world_to_object);
+    // Shape constructor that takes the transform from object space to world space.
+    Shape(const Transform *object_to_world);
 
     // The bounds of the object in object space.
     virtual AABB3f ObjectBounds() const = 0;
@@ -27,11 +27,10 @@ class Shape {
     virtual bool Intersect(Ray3f ray) const = 0;
 
   protected:
-    // The transform to get from object coordinates to world coordinates.
+    // The transform to get from object coordinates to world coordinates. Since Transforms store
+    // their inverse matrices and have a fast function for computing the inverse, we avoid
+    // explicitly storing the world to object transform.
     const Transform *object_to_world;
-    // The transform to get from world coordinates to object coordinates. This should be the
-    // inverse of object_to_world, but we precompute it for performance.
-    const Transform *world_to_object;
     // Whether the world-object transforms swap the handedness of the coordinate space.
     const bool swaps_handedness;
 };

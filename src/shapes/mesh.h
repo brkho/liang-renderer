@@ -36,15 +36,12 @@ struct Mesh {
   const std::shared_ptr<uint> elements;
   // Object to world transform.
   const Transform *object_to_world;
-  // World to object transform.
-  const Transform *world_to_object;
 };
 
 // A nice wrapper around creating a shared pointer to a Mesh that performs some error checking on
 // the input.
 std::shared_ptr<Mesh> CreateMesh(uint num_vertices, const std::shared_ptr<TriangleVertex> vertices,
-    uint num_elements, const std::shared_ptr<uint> elements, const Transform *object_to_world,
-    const Transform *world_to_object);
+    uint num_elements, const std::shared_ptr<uint> elements, const Transform *object_to_world);
 
 class Triangle : Shape {
   public:

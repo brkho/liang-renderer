@@ -5,8 +5,7 @@
 #include "tests/test.h"
 
 // This is ugly and leaks memory. Clean this up when we have a real model loading system.
-std::shared_ptr<liang::Mesh> CreateUnitCube(liang::Transform *object_to_world,
-    liang::Transform *world_to_object) {
+std::shared_ptr<liang::Mesh> CreateUnitCube(liang::Transform *object_to_world) {
   std::shared_ptr<liang::TriangleVertex> vertices(new liang::TriangleVertex[36]);
   vertices.get()[0] = {liang::Point3f(-0.5, -0.5, -0.5), liang::Normal3f(0.0, 0.0, -1.0)};
   vertices.get()[1] = {liang::Point3f(0.5, -0.5, -0.5), liang::Normal3f(0.0, 0.0, -1.0)};
@@ -49,13 +48,12 @@ std::shared_ptr<liang::Mesh> CreateUnitCube(liang::Transform *object_to_world,
   for (uint i = 0; i < 36; i++) {
     elements.get()[i] = i;
   }
-  return liang::CreateMesh(36, vertices, 36, elements, object_to_world, world_to_object);
+  return liang::CreateMesh(36, vertices, 36, elements, object_to_world);
 }
 
 std::shared_ptr<liang::Mesh> CreateUnitCube() {
   liang::Transform *object_to_world = new liang::Transform();
-  liang::Transform *world_to_object = new liang::Transform();
-  return CreateUnitCube(object_to_world, world_to_object);
+  return CreateUnitCube(object_to_world);
 }
 
 TEST(MeshTest, CubeCreationTest) {
@@ -72,8 +70,7 @@ TEST(TriangleTest, CreationTest) {
 
 TEST(TriangleTest, IntersectionTest) {
   liang::Transform translate = liang::TranslationTransform(liang::Vector3f(5.0, 5.0, 5.0));
-  liang::Transform translate_inverse = translate.Inverse();
-  std::shared_ptr<liang::Mesh> mesh = CreateUnitCube(&translate, &translate_inverse);
+  std::shared_ptr<liang::Mesh> mesh = CreateUnitCube(&translate);
   auto triangles = liang::GetTriangles(mesh);
   liang::Ray3f ray = liang::Ray3f(liang::Point3f(5.2, 4.8, 5.2), liang::Vector3f(0.0, 0.0, -1.0));
   ASSERT_TRUE(triangles[0]->Intersect(ray));
@@ -91,8 +88,7 @@ TEST(TriangleTest, ObjectBoundsTest) {
   liang::Transform translate = liang::TranslationTransform(liang::Vector3f(5.0, 5.0, 5.0));
   liang::Transform scale = liang::ScaleTransform(2.0, 2.0, 2.0);
   liang::Transform transform = scale * translate;
-  liang::Transform transform_inverse = transform.Inverse();
-  std::shared_ptr<liang::Mesh> mesh = CreateUnitCube(&transform, &transform_inverse);
+  std::shared_ptr<liang::Mesh> mesh = CreateUnitCube(&transform);
   auto triangles = liang::GetTriangles(mesh);
   auto bounding_box = triangles[0]->ObjectBounds();
   Point3FloatEquals(bounding_box.min_point, -0.5, -0.5, -0.5);
@@ -103,8 +99,7 @@ TEST(TriangleTest, WorldBoundsTest) {
   liang::Transform translate = liang::TranslationTransform(liang::Vector3f(5.0, 5.0, 5.0));
   liang::Transform scale = liang::ScaleTransform(2.0, 2.0, 2.0);
   liang::Transform transform = scale * translate;
-  liang::Transform transform_inverse = transform.Inverse();
-  std::shared_ptr<liang::Mesh> mesh = CreateUnitCube(&transform, &transform_inverse);
+  std::shared_ptr<liang::Mesh> mesh = CreateUnitCube(&transform);
   auto triangles = liang::GetTriangles(mesh);
   auto bounding_box = triangles[0]->WorldBounds();
   Point3FloatEquals(bounding_box.min_point, 9.0, 9.0, 9.0);

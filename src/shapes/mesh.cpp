@@ -3,14 +3,13 @@
 namespace liang {
 
 std::shared_ptr<Mesh> CreateMesh(uint num_vertices, const std::shared_ptr<TriangleVertex> vertices,
-    uint num_elements, const std::shared_ptr<uint> elements, const Transform *object_to_world,
-    const Transform *world_to_object) {
+    uint num_elements, const std::shared_ptr<uint> elements, const Transform *object_to_world) {
   assert(num_elements % 3 == 0);
   for (uint i = 0; i < num_elements; i++) {
     assert(elements.get()[i] < num_vertices);
   }
   return std::shared_ptr<Mesh>(
-      new Mesh{num_vertices, vertices, num_elements, elements, object_to_world, world_to_object});
+      new Mesh{num_vertices, vertices, num_elements, elements, object_to_world});
 }
 
 std::vector<std::shared_ptr<Triangle>> GetTriangles(std::shared_ptr<Mesh> mesh) {
@@ -23,8 +22,7 @@ std::vector<std::shared_ptr<Triangle>> GetTriangles(std::shared_ptr<Mesh> mesh) 
 }
 
 Triangle::Triangle(std::shared_ptr<Mesh> parent, uint triangle_index) :
-    Shape(parent->object_to_world, parent->world_to_object), parent{parent},
-    triangle_index{triangle_index} {}
+    Shape(parent->object_to_world), parent{parent}, triangle_index{triangle_index} {}
 
 TriangleVertex Triangle::GetVertex(uint n) const {
   assert(n < 3);
