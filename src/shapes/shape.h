@@ -17,16 +17,16 @@ class Shape {
     // Shape constructor that takes the transform from world space to object space and vice versa.
     Shape(const Transform *object_to_world, const Transform *world_to_object);
 
-    // // The bounds of the object in object space.
-    // virtual AABB3f ObjectBounds() const = 0;
+    // The bounds of the object in object space.
+    virtual AABB3f ObjectBounds() const = 0;
 
-    // // The bounds of the object in world space.
-    // virtual AABB3f WorldBounds() const = 0;
+    // The bounds of the object in world space.
+    virtual AABB3f WorldBounds() const = 0;
 
-    // // Intersects the shape with a ray and returns true if there is an intersection.
-    // virtual bool Intersect(Ray3f ray) const = 0;
+    // Intersects the shape with a ray and returns true if there is an intersection.
+    virtual bool Intersect(Ray3f ray) const = 0;
 
-  private:
+  protected:
     // The transform to get from object coordinates to world coordinates.
     const Transform *object_to_world;
     // The transform to get from world coordinates to object coordinates. This should be the

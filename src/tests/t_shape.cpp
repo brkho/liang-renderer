@@ -5,7 +5,7 @@
 #include "tests/test.h"
 
 // This is ugly and leaks memory. Clean this up when we have a real model loading system.
-liang::Mesh CreateUnitCube() {
+std::shared_ptr<liang::Mesh> CreateUnitCube() {
   std::shared_ptr<liang::TriangleVertex> vertices(new liang::TriangleVertex[36]);
   vertices.get()[0] = {liang::Point3f(-0.5, -0.5, -0.5), liang::Normal3f(0.0, 0.0, -1.0)};
   vertices.get()[1] = {liang::Point3f(0.5, -0.5, -0.5), liang::Normal3f(0.0, 0.0, -1.0)};
@@ -51,9 +51,32 @@ liang::Mesh CreateUnitCube() {
 
   liang::Transform *object_to_world = new liang::Transform();
   liang::Transform *world_to_object = new liang::Transform();
-  return liang::Mesh(36, vertices, 36, elements, object_to_world, world_to_object);
+  return liang::CreateMesh(36, vertices, 36, elements, object_to_world, world_to_object);
 }
 
-TEST(MeshTest, MeshCreationTest) {
-  liang::Mesh mesh = CreateUnitCube();
+TEST(MeshTest, CubeCreationTest) {
+  std::shared_ptr<liang::Mesh> mesh = CreateUnitCube();
+  ASSERT_EQ(36, (int)mesh->num_vertices);
+  ASSERT_EQ(36, (int)mesh->num_elements);
+}
+
+TEST(TriangleTest, TriangleCreationTest) {
+  std::shared_ptr<liang::Mesh> mesh = CreateUnitCube();
+  auto triangles = liang::GetTriangles(mesh);
+  ASSERT_EQ(12, (int)triangles.size());
+}
+
+TEST(TriangleTest, TriangleIntersectionTest) {
+  std::shared_ptr<liang::Mesh> mesh = CreateUnitCube();
+  auto triangles = liang::GetTriangles(mesh);
+  liang::Ray3f ray = liang::Ray3f(liang::Point3f(0.2, -0.2, 0.2), liang::Vector3f(0.0, 0.0, -1.0));
+
+  ray = liang::Ray3f(liang::Point3f(0.2, -0.2, 0.2), liang::Vector3f(0.2649, -0.2649, -0.9271));
+  ASSERT_TRUE(triangles[0]->Intersect(ray));
+  ray = liang::Ray3f(liang::Point3f(0.2, -0.2, 0.2), liang::Vector3f(0.4444, -0.4444, -0.7778));
+  ASSERT_FALSE(triangles[0]->Intersect(ray));
+  ray = liang::Ray3f(liang::Point3f(-0.2, 0.2, 0.2), liang::Vector3f(0.0, 0.0, -1.0));
+  ASSERT_FALSE(triangles[0]->Intersect(ray));
+  ray = liang::Ray3f(liang::Point3f(-0.2, 0.2, 0.2), liang::Vector3f(0.0, 0.0, 1.0));
+  ASSERT_FALSE(triangles[0]->Intersect(ray));
 }
