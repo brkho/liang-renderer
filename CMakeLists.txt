@@ -26,8 +26,10 @@ include_directories("${source_dir}/googletest/include")
 include_directories("src/")
 
 file(GLOB_RECURSE PROJECT_HEADERS src/core/*.h
+                                  src/primitives/*.h
                                   src/shapes/*.h)
 file(GLOB_RECURSE PROJECT_SOURCES src/core/*.cpp
+                                  src/primitives/*.cpp
                                   src/shapes/*.cpp)
 file(GLOB PROJECT_CONFIGS CMakeLists.txt
                          .gitattributes

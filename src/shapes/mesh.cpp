@@ -12,7 +12,7 @@ std::shared_ptr<Mesh> CreateMesh(uint num_vertices, const std::shared_ptr<Triang
       new Mesh{num_vertices, vertices, num_elements, elements, object_to_world});
 }
 
-std::vector<std::shared_ptr<Triangle>> GetTriangles(std::shared_ptr<Mesh> mesh) {
+std::vector<std::shared_ptr<Triangle>> CreateTriangles(std::shared_ptr<Mesh> mesh) {
   std::vector<std::shared_ptr<Triangle>> triangles;
   for (uint i = 0; i < mesh->num_elements; i += 3) {
     uint triangle_index = i / 3;

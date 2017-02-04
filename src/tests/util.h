@@ -8,6 +8,7 @@
 #include "core/geometry.h"
 #include "core/liang.h"
 #include "core/transform.h"
+#include "shapes/mesh.h"
 
 extern void Vector2IntEquals(liang::Vector2i vec, int x, int y);
 
@@ -31,5 +32,10 @@ extern void AABB3FloatEquals(liang::AABB3f box, float min_x, float min_y, float 
     float max_y, float max_z);
 
 extern void AssertMatEquals(const liang::Matrix4x4 &matrix, const std::vector<float> &values);
+
+// This is ugly and leaks memory. Clean this up when we have a real model loading system.
+extern std::shared_ptr<liang::Mesh> CreateUnitCube(liang::Transform *object_to_world);
+
+extern std::shared_ptr<liang::Mesh> CreateUnitCube();
 
 #endif  // LIANG_TEST_UTIL

@@ -43,7 +43,7 @@ struct Mesh {
 std::shared_ptr<Mesh> CreateMesh(uint num_vertices, const std::shared_ptr<TriangleVertex> vertices,
     uint num_elements, const std::shared_ptr<uint> elements, const Transform *object_to_world);
 
-class Triangle : Shape {
+class Triangle : public Shape {
   public:
     // Triangle constructor that takes a Mesh as a parent and its index in that mesh.
     Triangle(std::shared_ptr<Mesh> parent, uint triangle_index);
@@ -70,7 +70,7 @@ class Triangle : Shape {
 // Creates a vector to a list of shared pointers to a Mesh's Triangles. This actually
 // constructs the Triangle instances, so multiple calls to GetTriangles will return different
 // sets of Triangle instances.
-std::vector<std::shared_ptr<Triangle>> GetTriangles(std::shared_ptr<Mesh> mesh);
+std::vector<std::shared_ptr<Triangle>> CreateTriangles(std::shared_ptr<Mesh> mesh);
 
 }
 
