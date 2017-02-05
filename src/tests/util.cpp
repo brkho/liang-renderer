@@ -121,3 +121,15 @@ std::shared_ptr<liang::Mesh> CreateUnitCube() {
   liang::Transform *object_to_world = new liang::Transform();
   return CreateUnitCube(object_to_world);
 }
+
+extern std::vector<std::shared_ptr<liang::GeometricPrimitive>> CreateUnitCubePrimitives(
+    liang::Transform *object_to_world) {
+  std::shared_ptr<liang::Mesh> mesh = CreateUnitCube(object_to_world);
+  auto triangles = liang::CreateTriangles(mesh);
+  return liang::CreateGeometricPrimitives(triangles);
+}
+
+extern std::vector<std::shared_ptr<liang::GeometricPrimitive>> CreateUnitCubePrimitives() {
+  liang::Transform *object_to_world = new liang::Transform();
+  return CreateUnitCubePrimitives(object_to_world);
+}

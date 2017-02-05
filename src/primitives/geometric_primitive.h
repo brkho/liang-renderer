@@ -26,8 +26,8 @@ class GeometricPrimitive : public Primitive {
     bool Intersect(Ray3f ray) const;
 
   private:
+    // The Shape the GeometricPrimitive contains.
     std::shared_ptr<Shape> shape;
-    // TODO(brkho): Add Material support.
 };
 
 // Creates and returns a vector of GeometricPrimitive pointers created from a vector of Triangle

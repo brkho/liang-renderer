@@ -8,6 +8,7 @@
 #include "core/geometry.h"
 #include "core/liang.h"
 #include "core/transform.h"
+#include "primitives/geometric_primitive.h"
 #include "shapes/mesh.h"
 
 extern void Vector2IntEquals(liang::Vector2i vec, int x, int y);
@@ -37,5 +38,10 @@ extern void AssertMatEquals(const liang::Matrix4x4 &matrix, const std::vector<fl
 extern std::shared_ptr<liang::Mesh> CreateUnitCube(liang::Transform *object_to_world);
 
 extern std::shared_ptr<liang::Mesh> CreateUnitCube();
+
+extern std::vector<std::shared_ptr<liang::GeometricPrimitive>> CreateUnitCubePrimitives(
+    liang::Transform *object_to_world);
+
+extern std::vector<std::shared_ptr<liang::GeometricPrimitive>> CreateUnitCubePrimitives();
 
 #endif  // LIANG_TEST_UTIL
