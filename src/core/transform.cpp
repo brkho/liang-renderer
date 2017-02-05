@@ -1,4 +1,5 @@
 #include "core/transform.h"
+#include "utils/math.h"
 
 namespace liang {
 
@@ -229,7 +230,7 @@ Transform RotateArbitraryAxisTransform(const Vector3f &axis, float theta) {
 }
 
 // Returns a look at transformation, also adapted from pbrt.
-Transform LookAtTransformation(const Vector3f &pos, const Vector3f &target, const Vector3f &up) {
+Transform LookAtTransform(const Vector3f &pos, const Vector3f &target, const Vector3f &up) {
   Vector3f direction = Normalize(target - pos);
   Vector3f left = Normalize(Cross(Normalize(up), direction));
   Vector3f new_up = Cross(direction, left);
@@ -237,6 +238,15 @@ Transform LookAtTransformation(const Vector3f &pos, const Vector3f &target, cons
       pos.y, left.z, new_up.z, direction.z, pos.z, 0, 0, 0, 1};
   Matrix4x4 inverse_matrix = Matrix4x4(inverse_values);
   return Transform(inverse_matrix.Inverse(), inverse_matrix);
+}
+
+// Adapted from pbrt.
+Transform PerspectiveTransform(float fov, float near, float far) {
+    float perspective_values[16] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, far / (far - near),
+        -far * near / (far - near), 0, 0, 1, 0};
+    Matrix4x4 perspective(perspective_values);
+    float inverse_tan_angle = 1.f / std::tan(DegreesToRadians(fov) / 2.f);
+    return ScaleTransform(inverse_tan_angle, inverse_tan_angle, 1.f) * Transform(perspective);
 }
 
 template <typename T>

@@ -90,10 +90,21 @@ bool Triangle::Intersect(Ray3f ray) const {
   float e0 = (sheared_p1.x * sheared_p2.y) - (sheared_p1.y * sheared_p2.x);
   float e1 = (sheared_p2.x * sheared_p0.y) - (sheared_p2.y * sheared_p0.x);
   float e2 = (sheared_p0.x * sheared_p1.y) - (sheared_p0.y * sheared_p1.x);
-  // These asserts should be explicitly handled.
-  assert(e0 != 0);
-  assert(e1 != 0);
-  assert(e2 != 0);
+
+  // Fall back to double precision if any edge is 0. This should happen very rarely because of
+  // sampling.
+  if (e0 == 0 || e1 == 0 || e2 == 0) {
+    double p2txp1ty = (double)sheared_p1.y * (double)sheared_p2.x;
+    double p2typ1tx = (double)sheared_p1.x * (double)sheared_p2.y;
+    e0 = (float)(p2typ1tx - p2txp1ty);
+    double p0txp2ty = (double)sheared_p2.x * (double)sheared_p0.y;
+    double p0typ2tx = (double)sheared_p2.y * (double)sheared_p0.x;
+    e1 = (float)(p0typ2tx - p0txp2ty);
+    double p1txp0ty = (double)sheared_p0.x * (double)sheared_p1.y;
+    double p1typ0tx = (double)sheared_p0.y * (double)sheared_p1.x;
+    e2 = (float)(p1typ0tx - p1txp0ty);
+  }
+
   if (!((e0 > 0 && e1 > 0 && e2 > 0) || (e0 < 0 && e1 < 0 && e2 < 0))) {
     return false;
   }

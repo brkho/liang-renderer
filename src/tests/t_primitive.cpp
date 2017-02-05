@@ -13,5 +13,5 @@ TEST(GeometricPrimitiveTest, Creation) {
 TEST(AggregatePrimitiveTest, Creation) {
   std::vector<std::shared_ptr<liang::GeometricPrimitive>> geo_prims = CreateUnitCubePrimitives();
   std::vector<std::shared_ptr<liang::Primitive>> prims(geo_prims.begin(), geo_prims.end());
-  liang::AggregatePrimitive aggregate(prims);
+  ASSERT_NO_THROW({liang::AggregatePrimitive{prims};});
 }

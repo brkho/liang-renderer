@@ -2,6 +2,7 @@
 #include "core/transform.h"
 #include "tests/util.h"
 #include "tests/test.h"
+#include "utils/math.h"
 
 TEST(TransformTest, Matrix4x4Creation) {
   liang::Matrix4x4 mat = liang::Matrix4x4();
@@ -233,12 +234,20 @@ TEST(TransformTest, TransformArbitraryAxisRotate) {
 }
 
 TEST(TransformTest, TransformLookAt) {
-  liang::Transform look = liang::LookAtTransformation(liang::Vector3f(1.0, 2.0, 3.0),
+  liang::Transform look = liang::LookAtTransform(liang::Vector3f(1.0, 2.0, 3.0),
       liang::Vector3f(-2.0, -5.0, 3.0), liang::Vector3f(1.0, 0.0, 0.0));
   float values[16] = {0, 0, -1, 3, 0.919145, -0.393919, 0, -0.131306, -0.393919, -0.919145, 0,
       2.232209, 0, 0, 0, 1};
   liang::Transform expected = liang::Transform(liang::Matrix4x4(values));
   ASSERT_TRUE(expected == look);
+}
+
+TEST(TransformTest, TransformPerspective) {
+  liang::Transform perspective = liang::PerspectiveTransform(90.0, 10.0, 11.0);
+  float values[16] = {1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 11.0, -110.0, 0.0, 0.0,
+      1.0, 0.0};
+  liang::Transform expected = liang::Transform(liang::Matrix4x4(values));
+  ASSERT_TRUE(expected == perspective);
 }
 
 TEST(TransformTest, TransformComposition) {

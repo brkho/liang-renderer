@@ -14,8 +14,6 @@
 #include <string>
 #include <vector>
 
-#define PI 3.1415926535897932
-
 typedef unsigned int uint;
 
 namespace liang {

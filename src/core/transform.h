@@ -152,7 +152,10 @@ Transform RotateZTransform(float theta);
 Transform RotateArbitraryAxisTransform(const Vector3f &axis, float theta);
 
 // Returns a look at transformation.
-Transform LookAtTransformation(const Vector3f &pos, const Vector3f &target, const Vector3f &up);
+Transform LookAtTransform(const Vector3f &pos, const Vector3f &target, const Vector3f &up);
+
+// Returns the perspective transform given a fov in degrees, a near plane, and a far plane.
+Transform PerspectiveTransform(float fov, float near, float far);
 
 }
 

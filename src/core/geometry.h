@@ -519,6 +519,10 @@ class Ray3f {
     Ray3f(Point3f origin, Vector3f direction) : Ray3f(origin,
         direction, std::numeric_limits<float>::infinity()) {}
 
+    // Default constructor for a ray that initializes a ray to (0, 0, 0) with direction (0, 0, 1)
+    // and max to to infinity.
+    Ray3f() : Ray3f(Point3f(0.f, 0.f, 0.f), Vector3f(0.f, 0.f, 1.f)) {}
+
     // Parameterized by t, return the point that the ray represents.
     Point3f operator()(float t) const {
       assert(t >= 0.0);
