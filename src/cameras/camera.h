@@ -7,6 +7,7 @@
 #ifndef LIANG_CAMERAS_CAMERA_H
 #define LIANG_CAMERAS_CAMERA_H
 
+#include "cameras/film.h"
 #include "core/geometry.h"
 #include "core/liang.h"
 #include "core/transform.h"
@@ -16,8 +17,8 @@ namespace liang {
 class Camera {
   public:
     // Camera constructor that takes the world to camera transform (probably returned via LookAt)
-    // and a film.
-    Camera(Transform world_to_camera);
+    // and a shared pointer to a film.
+    Camera(Transform world_to_camera, std::shared_ptr<Film> film);
 
     // Generates a ray given a point on the film. As in pbrt, this returns a float that represents
     // how much we should weight the generated ray.
@@ -26,6 +27,8 @@ class Camera {
   protected:
     // Transform from world space to camera space.
     Transform world_to_camera;
+    // Shared pointer to the film we are recording to.
+    std::shared_ptr<Film> film;
 };
 
 }

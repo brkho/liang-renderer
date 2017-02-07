@@ -3,14 +3,13 @@
 
 namespace liang {
 
-PerspectiveCamera::PerspectiveCamera(Transform world_to_camera, float fov, Point2f screen_min,
-    Point2f screen_max) : Camera{world_to_camera},
+PerspectiveCamera::PerspectiveCamera(Transform world_to_camera, std::shared_ptr<Film> film,
+    float fov, Point2f screen_min, Point2f screen_max) : Camera{world_to_camera, film},
     camera_to_screen{PerspectiveTransform(fov, NEAR_PLANE, FAR_PLANE)} {
   Transform screen_to_translated = TranslationTransform(Vector3f(-screen_min.x, -screen_max.y, 0));
   Transform translated_to_ndc = ScaleTransform(1.f / (screen_max.x - screen_min.x),
       1.f / (screen_min.y - screen_max.y), 1.f);
-  // When Film is implemented, use the dimensions from there instead of hard coding.
-  Transform ndc_to_raster = ScaleTransform(32.f, 32.f, 1.f);
+  Transform ndc_to_raster = ScaleTransform((float)film->width, (float)film->height, 1.f);
   screen_to_raster = ndc_to_raster * translated_to_ndc * screen_to_translated;
   raster_to_camera = camera_to_screen.Inverse() * screen_to_raster.Inverse();
 }

@@ -24,14 +24,17 @@ set_target_properties(libgtest PROPERTIES
 )
 include_directories("${source_dir}/googletest/include")
 include_directories("src/")
+include_directories(lib/stb/)
 
 file(GLOB_RECURSE PROJECT_HEADERS src/cameras/*.h
                                   src/core/*.h
+                                  src/filters/*.h
                                   src/primitives/*.h
                                   src/shapes/*.h
                                   src/utils/*.h)
 file(GLOB_RECURSE PROJECT_SOURCES src/cameras/*.cpp
                                   src/core/*.cpp
+                                  src/filters/*.cpp
                                   src/primitives/*.cpp
                                   src/shapes/*.cpp
                                   src/utils/*.cpp)
@@ -47,6 +50,15 @@ add_definitions(-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
 add_library(liang_lib STATIC ${PROJECT_SOURCES} ${PROJECT_HEADERS})
 
 add_executable(liang_exe src/main.cpp)
+add_custom_target(copy_assets ALL
+  COMMAND rsync
+      -r
+      "${PROJECT_SOURCE_DIR}/assets"
+      "${PROJECT_BINARY_DIR}"
+  COMMENT "Copy assets to build tree"
+  VERBATIM)
+
+
 set_target_properties(liang_exe PROPERTIES OUTPUT_NAME liang
     RUNTIME_OUTPUT_DIRECTORY /${CMAKE_BINARY_DIR}/bin/)
 target_link_libraries(liang_exe liang_lib)

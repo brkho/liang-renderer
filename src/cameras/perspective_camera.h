@@ -7,6 +7,7 @@
 #define LIANG_CAMERAS_PERSPECTIVE_CAMERA_H
 
 #include "cameras/camera.h"
+#include "cameras/film.h"
 #include "core/geometry.h"
 #include "core/liang.h"
 #include "core/transform.h"
@@ -22,8 +23,8 @@ class PerspectiveCamera : public Camera {
 
     // PerspectiveCamera constructor that takes the world to camera transform, the size of the
     // screen, and a film.
-    PerspectiveCamera(Transform world_to_camera, float fov, Point2f screen_min,
-        Point2f screen_max);
+    PerspectiveCamera(Transform world_to_camera, std::shared_ptr<Film> film, float fov,
+        Point2f screen_min, Point2f screen_max);
 
     // Generates a ray given a point on the film. As in pbrt, this returns a float that represents
     // how much we should weight the generated ray.
