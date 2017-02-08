@@ -11,8 +11,8 @@ void Vector2IntEquals(liang::Vector2i vec, int x, int y) {
 }
 
 void Vector2FloatEquals(liang::Vector2f vec, float x, float y) {
-  ASSERT_FLOAT_EQ(vec.x, x);
-  ASSERT_FLOAT_EQ(vec.y, y);
+  ASSERT_NEAR(vec.x, x, 0.00001);
+  ASSERT_NEAR(vec.y, y, 0.00001);
 }
 
 void Vector3IntEquals(liang::Vector3i vec, int x, int y, int z) {
@@ -22,9 +22,9 @@ void Vector3IntEquals(liang::Vector3i vec, int x, int y, int z) {
 }
 
 void Vector3FloatEquals(liang::Vector3f vec, float x, float y, float z) {
-  ASSERT_FLOAT_EQ(vec.x, x);
-  ASSERT_FLOAT_EQ(vec.y, y);
-  ASSERT_FLOAT_EQ(vec.z, z);
+  ASSERT_NEAR(vec.x, x, 0.00001);
+  ASSERT_NEAR(vec.y, y, 0.00001);
+  ASSERT_NEAR(vec.z, z, 0.00001);
 }
 
 void Point2IntEquals(liang::Point2i point, int x, int y) {
@@ -33,8 +33,8 @@ void Point2IntEquals(liang::Point2i point, int x, int y) {
 }
 
 void Point2FloatEquals(liang::Point2f point, float x, float y) {
-  ASSERT_FLOAT_EQ(point.x, x);
-  ASSERT_FLOAT_EQ(point.y, y);
+  ASSERT_NEAR(point.x, x, 0.00001);
+  ASSERT_NEAR(point.y, y, 0.00001);
 }
 
 void Point3IntEquals(liang::Point3i point, int x, int y, int z) {
@@ -44,25 +44,25 @@ void Point3IntEquals(liang::Point3i point, int x, int y, int z) {
 }
 
 void Point3FloatEquals(liang::Point3f point, float x, float y, float z) {
-  ASSERT_FLOAT_EQ(point.x, x);
-  ASSERT_FLOAT_EQ(point.y, y);
-  ASSERT_FLOAT_EQ(point.z, z);
+  ASSERT_NEAR(point.x, x, 0.00001);
+  ASSERT_NEAR(point.y, y, 0.00001);
+  ASSERT_NEAR(point.z, z, 0.00001);
 }
 
 void Normal3FloatEquals(liang::Normal3f normal, float x, float y, float z) {
-  ASSERT_FLOAT_EQ(normal.x, x);
-  ASSERT_FLOAT_EQ(normal.y, y);
-  ASSERT_FLOAT_EQ(normal.z, z);
+  ASSERT_NEAR(normal.x, x, 0.00001);
+  ASSERT_NEAR(normal.y, y, 0.00001);
+  ASSERT_NEAR(normal.z, z, 0.00001);
 }
 
 void AABB3FloatEquals(liang::AABB3f box, float min_x, float min_y, float min_z, float max_x,
     float max_y, float max_z) {
-  ASSERT_FLOAT_EQ(min_x, box.min_point.x);
-  ASSERT_FLOAT_EQ(min_y, box.min_point.y);
-  ASSERT_FLOAT_EQ(min_z, box.min_point.z);
-  ASSERT_FLOAT_EQ(max_x, box.max_point.x);
-  ASSERT_FLOAT_EQ(max_y, box.max_point.y);
-  ASSERT_FLOAT_EQ(max_z, box.max_point.z);
+  ASSERT_NEAR(min_x, box.min_point.x, 0.00001);
+  ASSERT_NEAR(min_y, box.min_point.y, 0.00001);
+  ASSERT_NEAR(min_z, box.min_point.z, 0.00001);
+  ASSERT_NEAR(max_x, box.max_point.x, 0.00001);
+  ASSERT_NEAR(max_y, box.max_point.y, 0.00001);
+  ASSERT_NEAR(max_z, box.max_point.z, 0.00001);
 }
 
 void AssertMatEquals(const liang::Matrix4x4 &matrix, const std::vector<float> &values) {

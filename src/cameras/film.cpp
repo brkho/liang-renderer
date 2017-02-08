@@ -7,6 +7,15 @@ namespace liang {
 
 Film::Film(uint width, uint height, std::unique_ptr<Filter> filter) : width{width}, height{height},
     filter{std::move(filter)}, pixels{std::unique_ptr<Pixel[]>(new Pixel[width * height])} {
+  ClearFilm();
+}
+
+Pixel Film::GetPixel(uint x, uint y) const {
+  assert(x < width && y < height);
+  return pixels.get()[y * width + x];
+}
+
+void Film::ClearFilm() {
   std::memset(pixels.get(), 0, sizeof(Pixel) * width * height);
 }
 
@@ -22,7 +31,7 @@ void Film::AddSample(float x, float y, float r, float g, float b, float weight) 
   pixels.get()[index].weight_sum += weight;
 }
 
-void Film::SaveAsPng(std::string name) {
+void Film::SaveAsPng(std::string name) const {
   char *output_pixels = new char[width * height * 3];
   for (uint i = 0; i < height; i++) {
     for (uint j = 0; j < width; j++) {

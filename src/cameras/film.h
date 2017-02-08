@@ -38,12 +38,22 @@ class Film {
     // filter.
     Film(uint width, uint height, std::unique_ptr<Filter> filter);
 
+    // Gets the pixel at the given coordinates where (0, 0) is the top left corner. This is mainy
+    // exposed for testing because I'm using stb_image to write to files. A more elegant solution
+    // would be to give the SaveAs* family of functions a stream instead of a filename, so then I
+    // can just inspect the stream during unit tests. Oh well, I guess I'll do that if I ever get
+    // around to writing my own image loading/saving module.
+    Pixel GetPixel(uint x, uint y) const;
+
+    // Clears the film back to its original state.
+    void ClearFilm();
+
     // Adds a sample's contribution to a given pixel (supplied in continuous coordinates).
     // TODO(brkho): Abstract over RGB with a class/struct.
     void AddSample(float x, float y, float r, float g, float b, float weight);
 
     // Saves the image as a .png after performing tone mapping from HDR to LDR.
-    void SaveAsPng(std::string name);
+    void SaveAsPng(std::string name) const;
 
     // Saves the image in high dynamic range as a .exr.
     // void SaveAsExr(std::string name);
